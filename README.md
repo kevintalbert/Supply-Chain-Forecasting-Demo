@@ -20,19 +20,19 @@ Tables (same names as CSV files without `.csv`):
 - `item_price_history_forecasting`
 - `procurement_transactions`
 
-Training and **`model_api`** load these tables through **`utils/data_access.py`** via Impala (`SELECT * FROM logistics.<table>`) when **`cml.data_v1`** is available (default on Cloudera AI). For laptop runs without Impala, set **`LOGISTICS_DATA_SOURCE=csv`** and put the three CSVs under **`data/raw/`** (or point **`LOGISTICS_DATA_DIR`** at them). Optional smoke check: **`python load_logistics_data.py`** prints row counts only.
+Training and **`model_api`** read Impala ``logistics`` tables via **`utils/data_access.py`** when **`cml.data_v1`** is available; **if tables are empty or reads fail, data loads automatically from CSV** under **`data/raw/`** or **`LOGISTICS_DATA_DIR`** (no warehouse writes). Force CSV-only with **`LOGISTICS_DATA_SOURCE=csv`**. **`python load_logistics_data.py`** prints Impala row counts only (read-only).
 
 ## Quickstart
 
-On **Cloudera AI**, omit **`LOGISTICS_DATA_SOURCE`** so reads use **`cml.data_v1`** against **`logistics`** (no project CSVs needed).
+On **Cloudera AI**, keep the three CSVs in **`data/raw/`** (or **`LOGISTICS_DATA_DIR`**) for automatic fallback when warehouse tables have no rows. Omit **`LOGISTICS_DATA_SOURCE`** to try Impala **`SELECT`** first (**no warehouse writes**).
 
 ```bash
 cd Supply-Chain-Forecasting-Demo
 pip install -r requirements.txt
 
-# Local CSV fallback only:
+# Optional: force CSV-only reads (skip Impala):
 export LOGISTICS_DATA_SOURCE=csv
-export LOGISTICS_DATA_DIR=/path/to/folder_with_three_csvs   # or copy into data/raw/
+export LOGISTICS_DATA_DIR=/path/to/folder_with_three_csvs   # or rely on data/raw/
 
 python main.py --all          # builds PDF + trains + builds RAG index
 ```
@@ -63,7 +63,19 @@ Example payloads:
 {"action": "health"}
 ```
 
-Deploy with `create_model.py` inside Cloudera AI (requires `CDSW_API_URL`, `CDSW_APIV2_KEY`, `CDSW_PROJECT_ID`).
+Deploy with **`create_model.py`** inside Cloudera AI (requires `CDSW_API_URL`, `CDSW_APIV2_KEY`, `CDSW_PROJECT_ID`). Schedule training with **`create_training_job.py`** / **`submit_experiment_jobs.py`** (same credentials).
+
+## CML API v2: Jobs (training) vs Models (serving)
+
+| Capability | What exists in this repo | Credentials |
+|------------|--------------------------|-------------|
+| **Jobs API** — schedule / trigger training (`main.py`) | **`create_training_job.py`** creates a Job + optional run; **`submit_experiment_jobs.py`** creates multiple Jobs with different **`EXPERIMENT_NAME`** env vars | `CDSW_API_URL`, `CDSW_APIV2_KEY`, `CDSW_PROJECT_ID` |
+| **Models API** — HTTP deployment of `model_api.predict` | **`create_model.py`** builds and deploys the registered model | Same env vars + optional `CML_RUNTIME_ID` |
+| **Experiments** | Training writes **`models/forecasting_metadata.json`** (MAEs, etc.). Set **`EXPERIMENT_NAME`** on the Job environment so each run tags metadata; compare Job runs or artifacts in the UI | — |
+
+Training picks **`DENSE_DEMO_NSN`** from the environment when set (defaults unchanged).
+
+Before **Models**: run **`python main.py --all`** (or a Job that runs it) so **`models/`** contains artifacts the served model loads.
 
 ## Notebooks
 
@@ -71,9 +83,9 @@ Open `notebooks/supply_chain_forecasting_walkthrough.ipynb` for a narrated walkt
 
 ## Cloudera AI touchpoints
 
-- **Workbench / Jobs**: `main.py` training job; scheduled retrains on fresh warehouse extracts.  
-- **Model Registry / Serving**: `model_api.py` multi-action API used by dashboards.  
-- **Data Warehouse**: Impala `logistics` database via **`utils/data_access.py`** (`cml.data_v1`); optional **`load_logistics_data.py`** to verify row counts.  
-- **Experiments**: Track `forecasting_metadata.json` MAEs per build.
+- **Workbench / Jobs**: **`create_training_job.py`** / **`submit_experiment_jobs.py`** (API v2); or run **`main.py`** manually.  
+- **Model Registry / Serving**: **`create_model.py`** + **`model_api.py`** (`predict`).  
+- **Data Warehouse**: **`utils/data_access.py`** reads Impala `logistics` or falls back to CSV (no writes); **`load_logistics_data.py`** row-count checks only.  
+- **Experiments**: **`EXPERIMENT_NAME`** env → **`forecasting_metadata.json`**; Job comparison via **`submit_experiment_jobs.py`** or separate Job definitions.
 
 Synthetic mock data only; safe for public demos.

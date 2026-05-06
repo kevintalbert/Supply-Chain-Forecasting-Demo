@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Deploy supply-chain forecasting model to Cloudera AI (cmlapi)."""
+"""Deploy supply-chain forecasting model to Cloudera AI (cmlapi Models API). See create_training_job.py for Jobs API."""
 
 import logging
 import os

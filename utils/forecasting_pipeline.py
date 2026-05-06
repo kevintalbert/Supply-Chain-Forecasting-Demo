@@ -329,6 +329,9 @@ def run_training(
             else []
         ),
     }
+    exp = os.environ.get("EXPERIMENT_NAME")
+    if exp:
+        summary["experiment_name"] = exp
     with open(os.path.join(models_dir, "forecasting_metadata.json"), "w") as f:
         json.dump(summary, f, indent=2)
     return summary

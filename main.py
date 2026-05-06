@@ -25,11 +25,7 @@ MODELS_DIR = os.path.join(PROJECT_ROOT, "models")
 
 
 def ensure_sample_data():
-    """Copy CSVs into data/raw when using local CSV mode (see utils/data_access.py)."""
-    from data_access import using_csv_files
-
-    if not using_csv_files():
-        return
+    """Ensure demo CSVs exist under data/raw (used when Impala tables are empty or unreadable)."""
     os.makedirs(DATA_RAW, exist_ok=True)
     names = [
         "supplier_shipping_performance.csv",
@@ -60,11 +56,12 @@ def ensure_sample_data():
 
 def train():
     from contract_rag import build_index
-    from forecasting_pipeline import run_training
+    from forecasting_pipeline import DENSE_DEMO_NSN, run_training
 
     ensure_sample_data()
     os.makedirs(MODELS_DIR, exist_ok=True)
-    summary = run_training(data_dir=DATA_RAW, models_dir=MODELS_DIR)
+    dense_nsn = os.environ.get("DENSE_DEMO_NSN", DENSE_DEMO_NSN)
+    summary = run_training(data_dir=DATA_RAW, models_dir=MODELS_DIR, dense_nsn=dense_nsn)
     print("Training summary:", summary)
 
     pdf = os.path.join(

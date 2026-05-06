@@ -1,4 +1,4 @@
-"""Load procurement data from the Impala warehouse (``logistics``) or local CSV fallback."""
+"""Load procurement data: try Impala ``logistics`` tables first; fall back to local CSVs (read-only)."""
 
 from __future__ import annotations
 
@@ -24,6 +24,8 @@ TABLE_PRICE = "item_price_history_forecasting"
 TABLE_SHIP = "supplier_shipping_performance"
 TABLE_TX = "procurement_transactions"
 
+_fallback_notice_shown = False
+
 
 def _csv_mode_explicit() -> Optional[str]:
     return os.environ.get("LOGISTICS_DATA_SOURCE", "").strip().lower() or None
@@ -31,24 +33,31 @@ def _csv_mode_explicit() -> Optional[str]:
 
 def using_csv_files() -> bool:
     """
-    True when readers use CSV under ``LOGISTICS_DATA_DIR`` / ``data/raw``.
-    False when ``cml.data_v1`` is used against Impala (default on Cloudera AI).
+    True when ``LOGISTICS_DATA_SOURCE`` forces CSV only (skip warehouse reads).
+    False otherwise — warehouse is attempted first when ``cml.data_v1`` exists, then CSV if empty/unavailable.
     """
     mode = _csv_mode_explicit()
     if mode in ("csv", "file", "local"):
         return True
     if mode in ("warehouse", "impala", "dw", "hive"):
         return False
-    # Default: warehouse if the CML Data library is available; otherwise CSV for laptops.
-    return cmldata is None
+    return False
+
+
+def _warn_fallback_csv(base: str, reason: str) -> None:
+    global _fallback_notice_shown
+    if _fallback_notice_shown:
+        return
+    _fallback_notice_shown = True
+    print(
+        f"Procurement data: using local CSVs under {base} ({reason}). "
+        "No database writes."
+    )
 
 
 def _query_warehouse(sql: str) -> pd.DataFrame:
     if cmldata is None:
-        raise RuntimeError(
-            "Warehouse reads require cml.data_v1 (Cloudera AI). "
-            "For local CSV, unset LOGISTICS_DATA_SOURCE=warehouse or run without that env."
-        )
+        raise RuntimeError("cml.data_v1 not available")
     conn = cmldata.get_connection(WAREHOUSE_CONN)
     try:
         return conn.get_pandas_dataframe(sql)
@@ -61,37 +70,68 @@ def _load_table_warehouse(table: str) -> pd.DataFrame:
     return _query_warehouse(f"SELECT * FROM {fq}")
 
 
+def _try_warehouse(table: str) -> Optional[pd.DataFrame]:
+    """Return DataFrame from Impala, or None if empty or SELECT fails."""
+    try:
+        df = _load_table_warehouse(table)
+        if df is None or len(df) == 0:
+            return None
+        return df
+    except Exception:
+        return None
+
+
+def _read_csv(base: str, filename: str) -> pd.DataFrame:
+    path = os.path.join(base, filename)
+    return pd.read_csv(path)
+
+
 def load_price_history(data_dir: Optional[str] = None) -> pd.DataFrame:
+    base = data_dir or DEFAULT_DATA_DIR
     if using_csv_files():
-        base = data_dir or DEFAULT_DATA_DIR
-        path = os.path.join(base, f"{TABLE_PRICE}.csv")
-        df = pd.read_csv(path)
+        df = _read_csv(base, f"{TABLE_PRICE}.csv")
+    elif cmldata is None:
+        _warn_fallback_csv(base, "cml.data_v1 not available")
+        df = _read_csv(base, f"{TABLE_PRICE}.csv")
     else:
-        df = _load_table_warehouse(TABLE_PRICE)
+        df = _try_warehouse(TABLE_PRICE)
+        if df is None:
+            _warn_fallback_csv(base, "warehouse empty or SELECT failed")
+            df = _read_csv(base, f"{TABLE_PRICE}.csv")
     if "date" in df.columns:
         df["date"] = pd.to_datetime(df["date"])
     return df.sort_values(["nsn", "date"])
 
 
 def load_transactions(data_dir: Optional[str] = None) -> pd.DataFrame:
+    base = data_dir or DEFAULT_DATA_DIR
     if using_csv_files():
-        base = data_dir or DEFAULT_DATA_DIR
-        path = os.path.join(base, f"{TABLE_TX}.csv")
-        df = pd.read_csv(path)
+        df = _read_csv(base, f"{TABLE_TX}.csv")
+    elif cmldata is None:
+        _warn_fallback_csv(base, "cml.data_v1 not available")
+        df = _read_csv(base, f"{TABLE_TX}.csv")
     else:
-        df = _load_table_warehouse(TABLE_TX)
+        df = _try_warehouse(TABLE_TX)
+        if df is None:
+            _warn_fallback_csv(base, "warehouse empty or SELECT failed")
+            df = _read_csv(base, f"{TABLE_TX}.csv")
     if "order_date" in df.columns:
         df["order_date"] = pd.to_datetime(df["order_date"])
     return df
 
 
 def load_supplier_shipping(data_dir: Optional[str] = None) -> pd.DataFrame:
+    base = data_dir or DEFAULT_DATA_DIR
     if using_csv_files():
-        base = data_dir or DEFAULT_DATA_DIR
-        path = os.path.join(base, f"{TABLE_SHIP}.csv")
-        df = pd.read_csv(path)
+        df = _read_csv(base, f"{TABLE_SHIP}.csv")
+    elif cmldata is None:
+        _warn_fallback_csv(base, "cml.data_v1 not available")
+        df = _read_csv(base, f"{TABLE_SHIP}.csv")
     else:
-        df = _load_table_warehouse(TABLE_SHIP)
+        df = _try_warehouse(TABLE_SHIP)
+        if df is None:
+            _warn_fallback_csv(base, "warehouse empty or SELECT failed")
+            df = _read_csv(base, f"{TABLE_SHIP}.csv")
     if "report_month" in df.columns:
         df["report_month"] = pd.to_datetime(df["report_month"])
     return df
