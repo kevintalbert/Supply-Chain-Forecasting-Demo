@@ -1,0 +1,5 @@
+{
+  "rag_index": "/Users/ktalbert/Downloads/Supply-Chain-Forecasting-Demo/models/contract_rag_index.joblib",
+  "num_chunks": 1,
+  "encoder": "tfidf_fallback"
+}

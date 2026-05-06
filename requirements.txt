@@ -1,0 +1,14 @@
+pandas>=2.1.0
+numpy>=1.24.0
+scikit-learn>=1.3.0
+statsmodels>=0.14.0
+joblib>=1.3.0
+requests>=2.31.0
+pypdf>=4.0.0
+reportlab>=4.0.0
+matplotlib>=3.8.0
+jupyter>=1.0.0
+
+# Optional / heavier (LSTM + semantic RAG). Comment out on constrained sandboxes.
+tensorflow>=2.15.0
+sentence-transformers>=2.6.0

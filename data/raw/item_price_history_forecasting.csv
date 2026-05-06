@@ -1,0 +1,244 @@
+nsn,item_description,date,unit_price,demand_quantity,market_index,supplier_id,contract_id,data_density_class,recommended_modeling_approach
+9150-01-123-4567,Turbine Oil,2023-01-01,19.04,157,1.005,SUP-005,CON-7781,dense_monthly,standard_arima_lstm_candidate
+9150-01-123-4567,Turbine Oil,2023-02-01,18.39,50,0.987,SUP-005,CON-7781,dense_monthly,standard_arima_lstm_candidate
+9150-01-123-4567,Turbine Oil,2023-03-01,19.99,163,0.996,SUP-005,CON-7781,dense_monthly,standard_arima_lstm_candidate
+9150-01-123-4567,Turbine Oil,2023-04-01,20.16,153,1.005,SUP-005,CON-7781,dense_monthly,standard_arima_lstm_candidate
+9150-01-123-4567,Turbine Oil,2023-05-01,19.35,96,1.007,SUP-005,CON-7781,dense_monthly,standard_arima_lstm_candidate
+9150-01-123-4567,Turbine Oil,2023-06-01,19.76,181,1.009,SUP-005,CON-7781,dense_monthly,standard_arima_lstm_candidate
+9150-01-123-4567,Turbine Oil,2023-07-01,18.58,132,1.003,SUP-005,CON-7781,dense_monthly,standard_arima_lstm_candidate
+9150-01-123-4567,Turbine Oil,2023-08-01,18.84,194,1.021,SUP-005,CON-7781,dense_monthly,standard_arima_lstm_candidate
+9150-01-123-4567,Turbine Oil,2023-09-01,18.45,99,1.01,SUP-005,CON-7781,dense_monthly,standard_arima_lstm_candidate
+9150-01-123-4567,Turbine Oil,2023-10-01,18.22,93,1.002,SUP-005,CON-7781,dense_monthly,standard_arima_lstm_candidate
+9150-01-123-4567,Turbine Oil,2023-11-01,18.04,157,1.024,SUP-005,CON-7781,dense_monthly,standard_arima_lstm_candidate
+9150-01-123-4567,Turbine Oil,2023-12-01,18.85,138,1.016,SUP-005,CON-7781,dense_monthly,standard_arima_lstm_candidate
+9150-01-123-4567,Turbine Oil,2024-01-01,20.02,126,1.023,SUP-005,CON-7781,dense_monthly,standard_arima_lstm_candidate
+9150-01-123-4567,Turbine Oil,2024-02-01,20.37,211,1.01,SUP-005,CON-7781,dense_monthly,standard_arima_lstm_candidate
+9150-01-123-4567,Turbine Oil,2024-03-01,20.98,200,1.029,SUP-005,CON-7781,dense_monthly,standard_arima_lstm_candidate
+9150-01-123-4567,Turbine Oil,2024-04-01,21.58,234,1.033,SUP-005,CON-7781,dense_monthly,standard_arima_lstm_candidate
+9150-01-123-4567,Turbine Oil,2024-05-01,20.48,198,1.017,SUP-005,CON-7781,dense_monthly,standard_arima_lstm_candidate
+9150-01-123-4567,Turbine Oil,2024-06-01,21.3,199,1.04,SUP-005,CON-7781,dense_monthly,standard_arima_lstm_candidate
+9150-01-123-4567,Turbine Oil,2024-07-01,19.28,161,1.016,SUP-005,CON-7781,dense_monthly,standard_arima_lstm_candidate
+9150-01-123-4567,Turbine Oil,2024-08-01,19.86,120,1.038,SUP-005,CON-7781,dense_monthly,standard_arima_lstm_candidate
+9150-01-123-4567,Turbine Oil,2024-09-01,19.05,113,1.021,SUP-005,CON-7781,dense_monthly,standard_arima_lstm_candidate
+9150-01-123-4567,Turbine Oil,2024-10-01,19.06,160,1.037,SUP-005,CON-7781,dense_monthly,standard_arima_lstm_candidate
+9150-01-123-4567,Turbine Oil,2024-11-01,19.6,191,1.029,SUP-005,CON-7781,dense_monthly,standard_arima_lstm_candidate
+9150-01-123-4567,Turbine Oil,2024-12-01,19.83,181,1.03,SUP-005,CON-7781,dense_monthly,standard_arima_lstm_candidate
+9150-01-123-4567,Turbine Oil,2025-01-01,20.37,169,1.026,SUP-005,CON-7781,dense_monthly,standard_arima_lstm_candidate
+9150-01-123-4567,Turbine Oil,2025-02-01,20.81,127,1.038,SUP-005,CON-7781,dense_monthly,standard_arima_lstm_candidate
+9150-01-123-4567,Turbine Oil,2025-03-01,22.86,181,1.056,SUP-005,CON-7781,dense_monthly,standard_arima_lstm_candidate
+9150-01-123-4567,Turbine Oil,2025-04-01,22.24,110,1.052,SUP-005,CON-7781,dense_monthly,standard_arima_lstm_candidate
+9150-01-123-4567,Turbine Oil,2025-05-01,21.67,94,1.041,SUP-005,CON-7781,dense_monthly,standard_arima_lstm_candidate
+9150-01-123-4567,Turbine Oil,2025-06-01,21.33,182,1.036,SUP-005,CON-7781,dense_monthly,standard_arima_lstm_candidate
+9150-01-123-4567,Turbine Oil,2025-07-01,21.68,170,1.05,SUP-005,CON-7781,dense_monthly,standard_arima_lstm_candidate
+9150-01-123-4567,Turbine Oil,2025-08-01,21.63,135,1.066,SUP-005,CON-7781,dense_monthly,standard_arima_lstm_candidate
+9150-01-123-4567,Turbine Oil,2025-09-01,20.52,118,1.04,SUP-005,CON-7781,dense_monthly,standard_arima_lstm_candidate
+9150-01-123-4567,Turbine Oil,2025-10-01,20.19,157,1.05,SUP-005,CON-7781,dense_monthly,standard_arima_lstm_candidate
+9150-01-123-4567,Turbine Oil,2025-11-01,19.91,165,1.042,SUP-005,CON-7781,dense_monthly,standard_arima_lstm_candidate
+9150-01-123-4567,Turbine Oil,2025-12-01,21.06,199,1.062,SUP-005,CON-7781,dense_monthly,standard_arima_lstm_candidate
+5320-00-987-6543,Rivet Assembly,2023-01-01,0.88,219,1.014,SUP-005,CON-8892,dense_monthly,standard_arima_lstm_candidate
+5320-00-987-6543,Rivet Assembly,2023-02-01,0.9,149,1.003,SUP-005,CON-8892,dense_monthly,standard_arima_lstm_candidate
+5320-00-987-6543,Rivet Assembly,2023-03-01,0.9,158,0.993,SUP-005,CON-8892,dense_monthly,standard_arima_lstm_candidate
+5320-00-987-6543,Rivet Assembly,2023-04-01,0.93,146,1.009,SUP-005,CON-8892,dense_monthly,standard_arima_lstm_candidate
+5320-00-987-6543,Rivet Assembly,2023-05-01,0.89,115,0.992,SUP-005,CON-8892,dense_monthly,standard_arima_lstm_candidate
+5320-00-987-6543,Rivet Assembly,2023-06-01,0.89,208,1.015,SUP-005,CON-8892,dense_monthly,standard_arima_lstm_candidate
+5320-00-987-6543,Rivet Assembly,2023-07-01,0.9,191,1.001,SUP-005,CON-8892,dense_monthly,standard_arima_lstm_candidate
+5320-00-987-6543,Rivet Assembly,2023-08-01,0.85,145,1.026,SUP-005,CON-8892,dense_monthly,standard_arima_lstm_candidate
+5320-00-987-6543,Rivet Assembly,2023-09-01,0.85,177,1.007,SUP-005,CON-8892,dense_monthly,standard_arima_lstm_candidate
+5320-00-987-6543,Rivet Assembly,2023-10-01,0.86,157,1.012,SUP-005,CON-8892,dense_monthly,standard_arima_lstm_candidate
+5320-00-987-6543,Rivet Assembly,2023-11-01,0.85,149,1.015,SUP-005,CON-8892,dense_monthly,standard_arima_lstm_candidate
+5320-00-987-6543,Rivet Assembly,2023-12-01,0.87,97,1.022,SUP-005,CON-8892,dense_monthly,standard_arima_lstm_candidate
+5320-00-987-6543,Rivet Assembly,2024-01-01,0.88,204,1.023,SUP-005,CON-8892,dense_monthly,standard_arima_lstm_candidate
+5320-00-987-6543,Rivet Assembly,2024-02-01,0.95,172,1.015,SUP-005,CON-8892,dense_monthly,standard_arima_lstm_candidate
+5320-00-987-6543,Rivet Assembly,2024-03-01,0.96,90,1.036,SUP-005,CON-8892,dense_monthly,standard_arima_lstm_candidate
+5320-00-987-6543,Rivet Assembly,2024-04-01,0.95,197,1.024,SUP-005,CON-8892,dense_monthly,standard_arima_lstm_candidate
+5320-00-987-6543,Rivet Assembly,2024-05-01,0.95,195,1.04,SUP-005,CON-8892,dense_monthly,standard_arima_lstm_candidate
+5320-00-987-6543,Rivet Assembly,2024-06-01,0.94,201,1.017,SUP-005,CON-8892,dense_monthly,standard_arima_lstm_candidate
+5320-00-987-6543,Rivet Assembly,2024-07-01,0.94,177,1.024,SUP-005,CON-8892,dense_monthly,standard_arima_lstm_candidate
+5320-00-987-6543,Rivet Assembly,2024-08-01,0.9,175,1.03,SUP-005,CON-8892,dense_monthly,standard_arima_lstm_candidate
+5320-00-987-6543,Rivet Assembly,2024-09-01,0.88,211,1.044,SUP-005,CON-8892,dense_monthly,standard_arima_lstm_candidate
+5320-00-987-6543,Rivet Assembly,2024-10-01,0.89,189,1.041,SUP-005,CON-8892,dense_monthly,standard_arima_lstm_candidate
+5320-00-987-6543,Rivet Assembly,2024-11-01,0.9,164,1.028,SUP-005,CON-8892,dense_monthly,standard_arima_lstm_candidate
+5320-00-987-6543,Rivet Assembly,2024-12-01,0.92,132,1.052,SUP-005,CON-8892,dense_monthly,standard_arima_lstm_candidate
+5320-00-987-6543,Rivet Assembly,2025-01-01,0.92,127,1.026,SUP-005,CON-8892,dense_monthly,standard_arima_lstm_candidate
+5320-00-987-6543,Rivet Assembly,2025-02-01,1.02,220,1.055,SUP-005,CON-8892,dense_monthly,standard_arima_lstm_candidate
+5320-00-987-6543,Rivet Assembly,2025-03-01,0.98,133,1.045,SUP-005,CON-8892,dense_monthly,standard_arima_lstm_candidate
+5320-00-987-6543,Rivet Assembly,2025-04-01,1.0,144,1.054,SUP-005,CON-8892,dense_monthly,standard_arima_lstm_candidate
+5320-00-987-6543,Rivet Assembly,2025-05-01,0.98,155,1.034,SUP-005,CON-8892,dense_monthly,standard_arima_lstm_candidate
+5320-00-987-6543,Rivet Assembly,2025-06-01,1.01,122,1.045,SUP-005,CON-8892,dense_monthly,standard_arima_lstm_candidate
+5320-00-987-6543,Rivet Assembly,2025-07-01,1.02,195,1.063,SUP-005,CON-8892,dense_monthly,standard_arima_lstm_candidate
+5320-00-987-6543,Rivet Assembly,2025-08-01,0.97,176,1.039,SUP-005,CON-8892,dense_monthly,standard_arima_lstm_candidate
+5320-00-987-6543,Rivet Assembly,2025-09-01,0.9,105,1.044,SUP-005,CON-8892,dense_monthly,standard_arima_lstm_candidate
+5320-00-987-6543,Rivet Assembly,2025-10-01,0.96,92,1.065,SUP-005,CON-8892,dense_monthly,standard_arima_lstm_candidate
+5320-00-987-6543,Rivet Assembly,2025-11-01,0.96,162,1.045,SUP-005,CON-8892,dense_monthly,standard_arima_lstm_candidate
+5320-00-987-6543,Rivet Assembly,2025-12-01,0.98,145,1.056,SUP-005,CON-8892,dense_monthly,standard_arima_lstm_candidate
+8415-01-555-1020,Cold Weather Glove Liner,2023-01-01,7.53,139,0.986,SUP-004,CON-6401,dense_monthly,standard_arima_lstm_candidate
+8415-01-555-1020,Cold Weather Glove Liner,2023-02-01,7.86,127,0.992,SUP-004,CON-6401,dense_monthly,standard_arima_lstm_candidate
+8415-01-555-1020,Cold Weather Glove Liner,2023-03-01,8.22,204,1.015,SUP-004,CON-6401,dense_monthly,standard_arima_lstm_candidate
+8415-01-555-1020,Cold Weather Glove Liner,2023-04-01,8.27,162,0.999,SUP-004,CON-6401,dense_monthly,standard_arima_lstm_candidate
+8415-01-555-1020,Cold Weather Glove Liner,2023-05-01,8.14,180,1.008,SUP-004,CON-6401,dense_monthly,standard_arima_lstm_candidate
+8415-01-555-1020,Cold Weather Glove Liner,2023-06-01,8.35,162,0.999,SUP-004,CON-6401,dense_monthly,standard_arima_lstm_candidate
+8415-01-555-1020,Cold Weather Glove Liner,2023-07-01,8.18,100,1.011,SUP-004,CON-6401,dense_monthly,standard_arima_lstm_candidate
+8415-01-555-1020,Cold Weather Glove Liner,2023-08-01,8.07,97,1.026,SUP-004,CON-6401,dense_monthly,standard_arima_lstm_candidate
+8415-01-555-1020,Cold Weather Glove Liner,2023-09-01,7.84,105,1.009,SUP-004,CON-6401,dense_monthly,standard_arima_lstm_candidate
+8415-01-555-1020,Cold Weather Glove Liner,2023-10-01,7.57,137,1.015,SUP-004,CON-6401,dense_monthly,standard_arima_lstm_candidate
+8415-01-555-1020,Cold Weather Glove Liner,2023-11-01,7.86,138,1.007,SUP-004,CON-6401,dense_monthly,standard_arima_lstm_candidate
+8415-01-555-1020,Cold Weather Glove Liner,2023-12-01,7.76,175,1.027,SUP-004,CON-6401,dense_monthly,standard_arima_lstm_candidate
+8415-01-555-1020,Cold Weather Glove Liner,2024-01-01,8.63,82,1.035,SUP-004,CON-6401,dense_monthly,standard_arima_lstm_candidate
+8415-01-555-1020,Cold Weather Glove Liner,2024-02-01,8.39,137,1.036,SUP-004,CON-6401,dense_monthly,standard_arima_lstm_candidate
+8415-01-555-1020,Cold Weather Glove Liner,2024-03-01,9.02,142,1.028,SUP-004,CON-6401,dense_monthly,standard_arima_lstm_candidate
+8415-01-555-1020,Cold Weather Glove Liner,2024-04-01,9.02,223,1.012,SUP-004,CON-6401,dense_monthly,standard_arima_lstm_candidate
+8415-01-555-1020,Cold Weather Glove Liner,2024-05-01,8.64,190,1.018,SUP-004,CON-6401,dense_monthly,standard_arima_lstm_candidate
+8415-01-555-1020,Cold Weather Glove Liner,2024-06-01,8.96,91,1.039,SUP-004,CON-6401,dense_monthly,standard_arima_lstm_candidate
+8415-01-555-1020,Cold Weather Glove Liner,2024-07-01,8.48,89,1.02,SUP-004,CON-6401,dense_monthly,standard_arima_lstm_candidate
+8415-01-555-1020,Cold Weather Glove Liner,2024-08-01,8.05,110,1.044,SUP-004,CON-6401,dense_monthly,standard_arima_lstm_candidate
+8415-01-555-1020,Cold Weather Glove Liner,2024-09-01,8.16,198,1.039,SUP-004,CON-6401,dense_monthly,standard_arima_lstm_candidate
+8415-01-555-1020,Cold Weather Glove Liner,2024-10-01,8.24,133,1.026,SUP-004,CON-6401,dense_monthly,standard_arima_lstm_candidate
+8415-01-555-1020,Cold Weather Glove Liner,2024-11-01,8.23,115,1.048,SUP-004,CON-6401,dense_monthly,standard_arima_lstm_candidate
+8415-01-555-1020,Cold Weather Glove Liner,2024-12-01,8.12,151,1.026,SUP-004,CON-6401,dense_monthly,standard_arima_lstm_candidate
+8415-01-555-1020,Cold Weather Glove Liner,2025-01-01,8.85,148,1.032,SUP-004,CON-6401,dense_monthly,standard_arima_lstm_candidate
+8415-01-555-1020,Cold Weather Glove Liner,2025-02-01,8.66,149,1.033,SUP-004,CON-6401,dense_monthly,standard_arima_lstm_candidate
+8415-01-555-1020,Cold Weather Glove Liner,2025-03-01,9.14,217,1.05,SUP-004,CON-6401,dense_monthly,standard_arima_lstm_candidate
+8415-01-555-1020,Cold Weather Glove Liner,2025-04-01,9.24,112,1.031,SUP-004,CON-6401,dense_monthly,standard_arima_lstm_candidate
+8415-01-555-1020,Cold Weather Glove Liner,2025-05-01,9.62,161,1.059,SUP-004,CON-6401,dense_monthly,standard_arima_lstm_candidate
+8415-01-555-1020,Cold Weather Glove Liner,2025-06-01,9.16,73,1.062,SUP-004,CON-6401,dense_monthly,standard_arima_lstm_candidate
+8415-01-555-1020,Cold Weather Glove Liner,2025-07-01,8.88,135,1.063,SUP-004,CON-6401,dense_monthly,standard_arima_lstm_candidate
+8415-01-555-1020,Cold Weather Glove Liner,2025-08-01,8.37,161,1.041,SUP-004,CON-6401,dense_monthly,standard_arima_lstm_candidate
+8415-01-555-1020,Cold Weather Glove Liner,2025-09-01,8.7,176,1.067,SUP-004,CON-6401,dense_monthly,standard_arima_lstm_candidate
+8415-01-555-1020,Cold Weather Glove Liner,2025-10-01,8.66,51,1.045,SUP-004,CON-6401,dense_monthly,standard_arima_lstm_candidate
+8415-01-555-1020,Cold Weather Glove Liner,2025-11-01,8.45,213,1.062,SUP-004,CON-6401,dense_monthly,standard_arima_lstm_candidate
+8415-01-555-1020,Cold Weather Glove Liner,2025-12-01,8.63,119,1.061,SUP-004,CON-6401,dense_monthly,standard_arima_lstm_candidate
+6515-01-700-2201,Field Medical Kit,2023-01-01,41.03,143,1.007,SUP-003,CON-9510,dense_monthly,standard_arima_lstm_candidate
+6515-01-700-2201,Field Medical Kit,2023-02-01,44.17,174,1.008,SUP-003,CON-9510,dense_monthly,standard_arima_lstm_candidate
+6515-01-700-2201,Field Medical Kit,2023-03-01,44.28,156,1.014,SUP-003,CON-9510,dense_monthly,standard_arima_lstm_candidate
+6515-01-700-2201,Field Medical Kit,2023-04-01,46.1,98,1.0,SUP-003,CON-9510,dense_monthly,standard_arima_lstm_candidate
+6515-01-700-2201,Field Medical Kit,2023-05-01,45.36,138,1.01,SUP-003,CON-9510,dense_monthly,standard_arima_lstm_candidate
+6515-01-700-2201,Field Medical Kit,2023-06-01,42.94,135,1.003,SUP-003,CON-9510,dense_monthly,standard_arima_lstm_candidate
+6515-01-700-2201,Field Medical Kit,2023-07-01,44.56,125,1.005,SUP-003,CON-9510,dense_monthly,standard_arima_lstm_candidate
+6515-01-700-2201,Field Medical Kit,2023-08-01,43.16,201,1.021,SUP-003,CON-9510,dense_monthly,standard_arima_lstm_candidate
+6515-01-700-2201,Field Medical Kit,2023-09-01,40.92,146,1.02,SUP-003,CON-9510,dense_monthly,standard_arima_lstm_candidate
+6515-01-700-2201,Field Medical Kit,2023-10-01,41.14,155,1.021,SUP-003,CON-9510,dense_monthly,standard_arima_lstm_candidate
+6515-01-700-2201,Field Medical Kit,2023-11-01,42.03,147,1.025,SUP-003,CON-9510,dense_monthly,standard_arima_lstm_candidate
+6515-01-700-2201,Field Medical Kit,2023-12-01,41.94,137,1.016,SUP-003,CON-9510,dense_monthly,standard_arima_lstm_candidate
+6515-01-700-2201,Field Medical Kit,2024-01-01,44.04,177,1.017,SUP-003,CON-9510,dense_monthly,standard_arima_lstm_candidate
+6515-01-700-2201,Field Medical Kit,2024-02-01,47.51,124,1.032,SUP-003,CON-9510,dense_monthly,standard_arima_lstm_candidate
+6515-01-700-2201,Field Medical Kit,2024-03-01,47.26,151,1.026,SUP-003,CON-9510,dense_monthly,standard_arima_lstm_candidate
+6515-01-700-2201,Field Medical Kit,2024-04-01,46.72,121,1.034,SUP-003,CON-9510,dense_monthly,standard_arima_lstm_candidate
+6515-01-700-2201,Field Medical Kit,2024-05-01,46.51,148,1.012,SUP-003,CON-9510,dense_monthly,standard_arima_lstm_candidate
+6515-01-700-2201,Field Medical Kit,2024-06-01,46.34,168,1.04,SUP-003,CON-9510,dense_monthly,standard_arima_lstm_candidate
+6515-01-700-2201,Field Medical Kit,2024-07-01,44.67,253,1.017,SUP-003,CON-9510,dense_monthly,standard_arima_lstm_candidate
+6515-01-700-2201,Field Medical Kit,2024-08-01,46.44,110,1.046,SUP-003,CON-9510,dense_monthly,standard_arima_lstm_candidate
+6515-01-700-2201,Field Medical Kit,2024-09-01,44.33,97,1.039,SUP-003,CON-9510,dense_monthly,standard_arima_lstm_candidate
+6515-01-700-2201,Field Medical Kit,2024-10-01,42.14,174,1.033,SUP-003,CON-9510,dense_monthly,standard_arima_lstm_candidate
+6515-01-700-2201,Field Medical Kit,2024-11-01,44.11,190,1.032,SUP-003,CON-9510,dense_monthly,standard_arima_lstm_candidate
+6515-01-700-2201,Field Medical Kit,2024-12-01,46.05,143,1.051,SUP-003,CON-9510,dense_monthly,standard_arima_lstm_candidate
+6515-01-700-2201,Field Medical Kit,2025-01-01,46.85,144,1.045,SUP-003,CON-9510,dense_monthly,standard_arima_lstm_candidate
+6515-01-700-2201,Field Medical Kit,2025-02-01,48.62,167,1.043,SUP-003,CON-9510,dense_monthly,standard_arima_lstm_candidate
+6515-01-700-2201,Field Medical Kit,2025-03-01,50.31,167,1.03,SUP-003,CON-9510,dense_monthly,standard_arima_lstm_candidate
+6515-01-700-2201,Field Medical Kit,2025-04-01,50.56,150,1.049,SUP-003,CON-9510,dense_monthly,standard_arima_lstm_candidate
+6515-01-700-2201,Field Medical Kit,2025-05-01,51.36,165,1.035,SUP-003,CON-9510,dense_monthly,standard_arima_lstm_candidate
+6515-01-700-2201,Field Medical Kit,2025-06-01,48.09,204,1.048,SUP-003,CON-9510,dense_monthly,standard_arima_lstm_candidate
+6515-01-700-2201,Field Medical Kit,2025-07-01,47.82,66,1.059,SUP-003,CON-9510,dense_monthly,standard_arima_lstm_candidate
+6515-01-700-2201,Field Medical Kit,2025-08-01,46.78,165,1.056,SUP-003,CON-9510,dense_monthly,standard_arima_lstm_candidate
+6515-01-700-2201,Field Medical Kit,2025-09-01,44.44,131,1.049,SUP-003,CON-9510,dense_monthly,standard_arima_lstm_candidate
+6515-01-700-2201,Field Medical Kit,2025-10-01,45.05,167,1.053,SUP-003,CON-9510,dense_monthly,standard_arima_lstm_candidate
+6515-01-700-2201,Field Medical Kit,2025-11-01,47.57,128,1.067,SUP-003,CON-9510,dense_monthly,standard_arima_lstm_candidate
+6515-01-700-2201,Field Medical Kit,2025-12-01,47.75,141,1.046,SUP-003,CON-9510,dense_monthly,standard_arima_lstm_candidate
+1560-00-221-8740,Aircraft Fastener Set,2023-01-01,13.84,151,0.997,SUP-005,CON-4420,dense_monthly,standard_arima_lstm_candidate
+1560-00-221-8740,Aircraft Fastener Set,2023-02-01,14.79,121,0.998,SUP-005,CON-4420,dense_monthly,standard_arima_lstm_candidate
+1560-00-221-8740,Aircraft Fastener Set,2023-03-01,15.49,113,1.017,SUP-005,CON-4420,dense_monthly,standard_arima_lstm_candidate
+1560-00-221-8740,Aircraft Fastener Set,2023-04-01,15.05,63,0.997,SUP-005,CON-4420,dense_monthly,standard_arima_lstm_candidate
+1560-00-221-8740,Aircraft Fastener Set,2023-05-01,15.38,156,1.004,SUP-005,CON-4420,dense_monthly,standard_arima_lstm_candidate
+1560-00-221-8740,Aircraft Fastener Set,2023-06-01,15.18,141,1.009,SUP-005,CON-4420,dense_monthly,standard_arima_lstm_candidate
+1560-00-221-8740,Aircraft Fastener Set,2023-07-01,14.87,208,1.024,SUP-005,CON-4420,dense_monthly,standard_arima_lstm_candidate
+1560-00-221-8740,Aircraft Fastener Set,2023-08-01,14.19,228,1.025,SUP-005,CON-4420,dense_monthly,standard_arima_lstm_candidate
+1560-00-221-8740,Aircraft Fastener Set,2023-09-01,13.55,154,1.005,SUP-005,CON-4420,dense_monthly,standard_arima_lstm_candidate
+1560-00-221-8740,Aircraft Fastener Set,2023-10-01,13.8,161,1.02,SUP-005,CON-4420,dense_monthly,standard_arima_lstm_candidate
+1560-00-221-8740,Aircraft Fastener Set,2023-11-01,14.16,182,1.026,SUP-005,CON-4420,dense_monthly,standard_arima_lstm_candidate
+1560-00-221-8740,Aircraft Fastener Set,2023-12-01,15.01,193,1.025,SUP-005,CON-4420,dense_monthly,standard_arima_lstm_candidate
+1560-00-221-8740,Aircraft Fastener Set,2024-01-01,15.31,102,1.008,SUP-005,CON-4420,dense_monthly,standard_arima_lstm_candidate
+1560-00-221-8740,Aircraft Fastener Set,2024-02-01,16.1,132,1.022,SUP-005,CON-4420,dense_monthly,standard_arima_lstm_candidate
+1560-00-221-8740,Aircraft Fastener Set,2024-03-01,16.13,133,1.009,SUP-005,CON-4420,dense_monthly,standard_arima_lstm_candidate
+1560-00-221-8740,Aircraft Fastener Set,2024-04-01,15.66,99,1.013,SUP-005,CON-4420,dense_monthly,standard_arima_lstm_candidate
+1560-00-221-8740,Aircraft Fastener Set,2024-05-01,15.77,60,1.029,SUP-005,CON-4420,dense_monthly,standard_arima_lstm_candidate
+1560-00-221-8740,Aircraft Fastener Set,2024-06-01,16.05,98,1.017,SUP-005,CON-4420,dense_monthly,standard_arima_lstm_candidate
+1560-00-221-8740,Aircraft Fastener Set,2024-07-01,16.07,205,1.039,SUP-005,CON-4420,dense_monthly,standard_arima_lstm_candidate
+1560-00-221-8740,Aircraft Fastener Set,2024-08-01,15.19,89,1.025,SUP-005,CON-4420,dense_monthly,standard_arima_lstm_candidate
+1560-00-221-8740,Aircraft Fastener Set,2024-09-01,14.77,125,1.035,SUP-005,CON-4420,dense_monthly,standard_arima_lstm_candidate
+1560-00-221-8740,Aircraft Fastener Set,2024-10-01,15.03,154,1.039,SUP-005,CON-4420,dense_monthly,standard_arima_lstm_candidate
+1560-00-221-8740,Aircraft Fastener Set,2024-11-01,15.14,84,1.034,SUP-005,CON-4420,dense_monthly,standard_arima_lstm_candidate
+1560-00-221-8740,Aircraft Fastener Set,2024-12-01,15.17,200,1.025,SUP-005,CON-4420,dense_monthly,standard_arima_lstm_candidate
+1560-00-221-8740,Aircraft Fastener Set,2025-01-01,16.15,124,1.033,SUP-005,CON-4420,dense_monthly,standard_arima_lstm_candidate
+1560-00-221-8740,Aircraft Fastener Set,2025-02-01,16.79,176,1.036,SUP-005,CON-4420,dense_monthly,standard_arima_lstm_candidate
+1560-00-221-8740,Aircraft Fastener Set,2025-03-01,16.76,107,1.054,SUP-005,CON-4420,dense_monthly,standard_arima_lstm_candidate
+1560-00-221-8740,Aircraft Fastener Set,2025-04-01,17.3,51,1.039,SUP-005,CON-4420,dense_monthly,standard_arima_lstm_candidate
+1560-00-221-8740,Aircraft Fastener Set,2025-05-01,17.32,122,1.055,SUP-005,CON-4420,dense_monthly,standard_arima_lstm_candidate
+1560-00-221-8740,Aircraft Fastener Set,2025-06-01,16.51,208,1.036,SUP-005,CON-4420,dense_monthly,standard_arima_lstm_candidate
+1560-00-221-8740,Aircraft Fastener Set,2025-07-01,16.56,111,1.062,SUP-005,CON-4420,dense_monthly,standard_arima_lstm_candidate
+1560-00-221-8740,Aircraft Fastener Set,2025-08-01,15.38,175,1.048,SUP-005,CON-4420,dense_monthly,standard_arima_lstm_candidate
+1560-00-221-8740,Aircraft Fastener Set,2025-09-01,15.66,207,1.062,SUP-005,CON-4420,dense_monthly,standard_arima_lstm_candidate
+1560-00-221-8740,Aircraft Fastener Set,2025-10-01,15.71,175,1.063,SUP-005,CON-4420,dense_monthly,standard_arima_lstm_candidate
+1560-00-221-8740,Aircraft Fastener Set,2025-11-01,15.47,187,1.059,SUP-005,CON-4420,dense_monthly,standard_arima_lstm_candidate
+1560-00-221-8740,Aircraft Fastener Set,2025-12-01,15.48,222,1.045,SUP-005,CON-4420,dense_monthly,standard_arima_lstm_candidate
+4710-01-333-9090,Hydraulic Tube Assembly,2023-01-01,178.48,22,1.025,SUP-003,CON-3371,moderate_quarterly,gradient_boosting_with_features
+4710-01-333-9090,Hydraulic Tube Assembly,2023-04-01,173.02,15,1.009,SUP-003,CON-3371,moderate_quarterly,gradient_boosting_with_features
+4710-01-333-9090,Hydraulic Tube Assembly,2023-07-01,171.34,36,0.995,SUP-003,CON-3371,moderate_quarterly,gradient_boosting_with_features
+4710-01-333-9090,Hydraulic Tube Assembly,2023-10-01,181.73,27,1.007,SUP-003,CON-3371,moderate_quarterly,gradient_boosting_with_features
+4710-01-333-9090,Hydraulic Tube Assembly,2024-01-01,190.11,20,1.04,SUP-003,CON-3371,moderate_quarterly,gradient_boosting_with_features
+4710-01-333-9090,Hydraulic Tube Assembly,2024-04-01,190.16,30,1.059,SUP-003,CON-3371,moderate_quarterly,gradient_boosting_with_features
+4710-01-333-9090,Hydraulic Tube Assembly,2024-07-01,185.56,19,1.04,SUP-003,CON-3371,moderate_quarterly,gradient_boosting_with_features
+4710-01-333-9090,Hydraulic Tube Assembly,2024-10-01,203.8,29,1.089,SUP-003,CON-3371,moderate_quarterly,gradient_boosting_with_features
+4710-01-333-9090,Hydraulic Tube Assembly,2025-01-01,191.76,20,1.079,SUP-003,CON-3371,moderate_quarterly,gradient_boosting_with_features
+4710-01-333-9090,Hydraulic Tube Assembly,2025-04-01,198.14,16,1.05,SUP-003,CON-3371,moderate_quarterly,gradient_boosting_with_features
+4710-01-333-9090,Hydraulic Tube Assembly,2025-07-01,206.51,51,1.104,SUP-003,CON-3371,moderate_quarterly,gradient_boosting_with_features
+4710-01-333-9090,Hydraulic Tube Assembly,2025-10-01,189.96,26,1.102,SUP-003,CON-3371,moderate_quarterly,gradient_boosting_with_features
+5998-01-444-1122,Control Circuit Card,2023-01-01,915.76,42,1.007,SUP-005,CON-1129,moderate_quarterly,gradient_boosting_with_features
+5998-01-444-1122,Control Circuit Card,2023-04-01,936.81,18,0.995,SUP-005,CON-1129,moderate_quarterly,gradient_boosting_with_features
+5998-01-444-1122,Control Circuit Card,2023-07-01,910.89,16,1.039,SUP-005,CON-1129,moderate_quarterly,gradient_boosting_with_features
+5998-01-444-1122,Control Circuit Card,2023-10-01,950.86,27,1.027,SUP-005,CON-1129,moderate_quarterly,gradient_boosting_with_features
+5998-01-444-1122,Control Circuit Card,2024-01-01,1017.67,71,1.04,SUP-005,CON-1129,moderate_quarterly,gradient_boosting_with_features
+5998-01-444-1122,Control Circuit Card,2024-04-01,995.74,27,1.064,SUP-005,CON-1129,moderate_quarterly,gradient_boosting_with_features
+5998-01-444-1122,Control Circuit Card,2024-07-01,988.6,21,1.058,SUP-005,CON-1129,moderate_quarterly,gradient_boosting_with_features
+5998-01-444-1122,Control Circuit Card,2024-10-01,963.05,42,1.051,SUP-005,CON-1129,moderate_quarterly,gradient_boosting_with_features
+5998-01-444-1122,Control Circuit Card,2025-01-01,1075.13,22,1.06,SUP-005,CON-1129,moderate_quarterly,gradient_boosting_with_features
+5998-01-444-1122,Control Circuit Card,2025-04-01,1002.78,42,1.088,SUP-005,CON-1129,moderate_quarterly,gradient_boosting_with_features
+5998-01-444-1122,Control Circuit Card,2025-07-01,1111.08,25,1.089,SUP-005,CON-1129,moderate_quarterly,gradient_boosting_with_features
+5998-01-444-1122,Control Circuit Card,2025-10-01,1079.23,29,1.115,SUP-005,CON-1129,moderate_quarterly,gradient_boosting_with_features
+2990-00-832-1190,Fuel Pump Module,2023-01-01,354.74,21,1.011,SUP-005,CON-2375,moderate_quarterly,gradient_boosting_with_features
+2990-00-832-1190,Fuel Pump Module,2023-04-01,325.82,7,0.994,SUP-005,CON-2375,moderate_quarterly,gradient_boosting_with_features
+2990-00-832-1190,Fuel Pump Module,2023-07-01,341.88,43,1.011,SUP-005,CON-2375,moderate_quarterly,gradient_boosting_with_features
+2990-00-832-1190,Fuel Pump Module,2023-10-01,351.5,29,1.008,SUP-005,CON-2375,moderate_quarterly,gradient_boosting_with_features
+2990-00-832-1190,Fuel Pump Module,2024-01-01,367.11,4,1.018,SUP-005,CON-2375,moderate_quarterly,gradient_boosting_with_features
+2990-00-832-1190,Fuel Pump Module,2024-04-01,363.64,20,1.054,SUP-005,CON-2375,moderate_quarterly,gradient_boosting_with_features
+2990-00-832-1190,Fuel Pump Module,2024-07-01,356.84,38,1.073,SUP-005,CON-2375,moderate_quarterly,gradient_boosting_with_features
+2990-00-832-1190,Fuel Pump Module,2024-10-01,345.44,4,1.037,SUP-005,CON-2375,moderate_quarterly,gradient_boosting_with_features
+2990-00-832-1190,Fuel Pump Module,2025-01-01,357.92,32,1.056,SUP-005,CON-2375,moderate_quarterly,gradient_boosting_with_features
+2990-00-832-1190,Fuel Pump Module,2025-04-01,381.11,5,1.09,SUP-005,CON-2375,moderate_quarterly,gradient_boosting_with_features
+2990-00-832-1190,Fuel Pump Module,2025-07-01,373.56,12,1.063,SUP-005,CON-2375,moderate_quarterly,gradient_boosting_with_features
+2990-00-832-1190,Fuel Pump Module,2025-10-01,396.4,40,1.114,SUP-005,CON-2375,moderate_quarterly,gradient_boosting_with_features
+5340-01-880-0091,Vehicle Mounting Bracket,2023-01-01,52.37,19,1.005,SUP-005,CON-6102,moderate_quarterly,gradient_boosting_with_features
+5340-01-880-0091,Vehicle Mounting Bracket,2023-04-01,57.69,26,1.017,SUP-005,CON-6102,moderate_quarterly,gradient_boosting_with_features
+5340-01-880-0091,Vehicle Mounting Bracket,2023-07-01,55.02,17,1.025,SUP-005,CON-6102,moderate_quarterly,gradient_boosting_with_features
+5340-01-880-0091,Vehicle Mounting Bracket,2023-10-01,59.58,26,1.037,SUP-005,CON-6102,moderate_quarterly,gradient_boosting_with_features
+5340-01-880-0091,Vehicle Mounting Bracket,2024-01-01,63.57,29,1.03,SUP-005,CON-6102,moderate_quarterly,gradient_boosting_with_features
+5340-01-880-0091,Vehicle Mounting Bracket,2024-04-01,64.38,20,1.034,SUP-005,CON-6102,moderate_quarterly,gradient_boosting_with_features
+5340-01-880-0091,Vehicle Mounting Bracket,2024-07-01,66.54,31,1.076,SUP-005,CON-6102,moderate_quarterly,gradient_boosting_with_features
+5340-01-880-0091,Vehicle Mounting Bracket,2024-10-01,58.34,24,1.042,SUP-005,CON-6102,moderate_quarterly,gradient_boosting_with_features
+5340-01-880-0091,Vehicle Mounting Bracket,2025-01-01,59.7,35,1.06,SUP-005,CON-6102,moderate_quarterly,gradient_boosting_with_features
+5340-01-880-0091,Vehicle Mounting Bracket,2025-04-01,62.53,24,1.076,SUP-005,CON-6102,moderate_quarterly,gradient_boosting_with_features
+5340-01-880-0091,Vehicle Mounting Bracket,2025-07-01,70.13,18,1.104,SUP-005,CON-6102,moderate_quarterly,gradient_boosting_with_features
+5340-01-880-0091,Vehicle Mounting Bracket,2025-10-01,65.1,21,1.113,SUP-005,CON-6102,moderate_quarterly,gradient_boosting_with_features
+4820-00-111-2222,Legacy Valve,2016-01-01,437.44,4,0.961,SUP-009,CON-3004,sparse_multi_year,feature_based_forecast_or_analog_item
+4820-00-111-2222,Legacy Valve,2019-05-01,462.97,1,1.028,SUP-009,CON-3004,sparse_multi_year,feature_based_forecast_or_analog_item
+4820-00-111-2222,Legacy Valve,2023-02-01,672.66,3,1.086,SUP-009,CON-3004,sparse_multi_year,feature_based_forecast_or_analog_item
+4820-00-111-2222,Legacy Valve,2026-04-01,678.25,5,1.221,SUP-009,CON-3004,sparse_multi_year,feature_based_forecast_or_analog_item
+4820-00-111-2222,Legacy Valve,2029-08-01,775.62,2,1.284,SUP-009,CON-3004,sparse_multi_year,feature_based_forecast_or_analog_item
+6110-00-333-4444,Obsolete Power Regulator,2016-01-01,1121.69,1,0.935,SUP-008,CON-3005,sparse_multi_year,feature_based_forecast_or_analog_item
+6110-00-333-4444,Obsolete Power Regulator,2019-05-01,1255.19,2,1.037,SUP-008,CON-3005,sparse_multi_year,feature_based_forecast_or_analog_item
+6110-00-333-4444,Obsolete Power Regulator,2023-02-01,1575.23,3,1.074,SUP-008,CON-3005,sparse_multi_year,feature_based_forecast_or_analog_item
+6110-00-333-4444,Obsolete Power Regulator,2026-04-01,1836.9,5,1.192,SUP-008,CON-3005,sparse_multi_year,feature_based_forecast_or_analog_item
+6110-00-333-4444,Obsolete Power Regulator,2029-08-01,2161.88,2,1.301,SUP-008,CON-3005,sparse_multi_year,feature_based_forecast_or_analog_item
+1680-01-444-5555,Rare Seat Actuator,2016-01-01,2124.85,2,0.939,SUP-010,CON-3006,sparse_multi_year,feature_based_forecast_or_analog_item
+1680-01-444-5555,Rare Seat Actuator,2019-05-01,2539.64,4,1.063,SUP-010,CON-3006,sparse_multi_year,feature_based_forecast_or_analog_item
+1680-01-444-5555,Rare Seat Actuator,2023-02-01,2992.15,2,1.088,SUP-010,CON-3006,sparse_multi_year,feature_based_forecast_or_analog_item
+1680-01-444-5555,Rare Seat Actuator,2026-04-01,3392.73,5,1.152,SUP-010,CON-3006,sparse_multi_year,feature_based_forecast_or_analog_item
+1680-01-444-5555,Rare Seat Actuator,2029-08-01,4219.88,1,1.259,SUP-010,CON-3006,sparse_multi_year,feature_based_forecast_or_analog_item

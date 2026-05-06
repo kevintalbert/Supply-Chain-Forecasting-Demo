@@ -1,0 +1,16 @@
+{
+  "dense_nsn": "9150-01-123-4567",
+  "dense_points": 36,
+  "arima_mae_holdout": 0.6412728118538252,
+  "gbm_mae_holdout": 0.8152777777777794,
+  "lstm_mae_holdout": 0.7308591461181626,
+  "sparse_gbm_mae_holdout": 575.7241613782754,
+  "sparse_strategy": "gradient_boosting_on_gap_and_market_features",
+  "models_written": [
+    "dense_arima_fit.joblib",
+    "dense_gbm.joblib",
+    "sparse_gbm.joblib",
+    "dense_lstm.keras",
+    "dense_lstm_meta.joblib"
+  ]
+}
