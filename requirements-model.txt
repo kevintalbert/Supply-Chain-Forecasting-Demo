@@ -1,0 +1,20 @@
+# Minimal dependencies for ``model_api.predict`` on Cloudera AI model replicas.
+# Use with cdsw-build.sh + CDSW_REQUIREMENTS_PROFILE=model (see README).
+# Omits jupyter/streamlit/reportlab/matplotlib to keep the image small enough for registry push.
+
+--extra-index-url https://download.pytorch.org/whl/cpu
+
+pandas>=2.1.0
+numpy>=1.24.0
+scikit-learn>=1.3.0
+statsmodels>=0.14.0
+joblib>=1.3.0
+requests>=2.31.0
+pypdf>=4.0.0
+
+# LSTM inference (loads dense_lstm.keras)
+tensorflow>=2.15.0
+
+# RAG query encoding when the built index used sentence-transformers (not tfidf_fallback).
+# Install CPU-only torch first in cdsw-build.sh so Linux does not pull ~2GB+ of NVIDIA CUDA wheels.
+sentence-transformers>=2.6.0

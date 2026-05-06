@@ -25,9 +25,10 @@ class Deployer:
         if not all([self.host, self.api_key, self.project_id]):
             raise ValueError("Need CDSW_API_URL, CDSW_APIV2_KEY, CDSW_PROJECT_ID")
         self.client = cmlapi.default_client(url=self.host, cml_api_key=self.api_key)
+        # Keep in sync with create_training_job._DEFAULT_ML_RUNTIME (ML Runtime image for model build + replicas).
         self.runtime_id = os.getenv(
             "CML_RUNTIME_ID",
-            "docker.repository.cloudera.com/cloudera/cdsw/ml-runtime-pbj-workbench-python3.11-standard:2025.09.1-b5",
+            "docker.repository.cloudera.com/cloudera/cdsw/ml-runtime-pbj-workbench-python3.13-standard:2026.04.1-b7",
         )
         self.body = {
             "name": "supply-chain-price-forecast-api",
@@ -35,8 +36,8 @@ class Deployer:
             "file_path": "model_api.py",
             "function_name": "predict",
             "kernel": "python3",
-            "cpu": 4.0,
-            "memory": 16,
+            "cpu": 2.0,
+            "memory": 8,
             "nvidia_gpu": 0,
             "replicas": {"min": 1, "max": 2},
         }

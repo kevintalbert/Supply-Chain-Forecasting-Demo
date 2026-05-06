@@ -16,7 +16,38 @@ import os
 import subprocess
 import sys
 
-PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+
+def _project_root() -> str:
+    """Resolve repo root; ``__file__`` is missing in some notebook / job runners.
+
+    Override with ``SUPPLY_CHAIN_PROJECT_ROOT`` or ``CDSW_PROJECT_ROOT`` if needed.
+    """
+    for key in ("SUPPLY_CHAIN_PROJECT_ROOT", "CDSW_PROJECT_ROOT"):
+        override = (os.environ.get(key) or "").strip()
+        if override and os.path.isdir(override):
+            return os.path.abspath(override)
+
+    try:
+        here = __file__
+    except NameError:
+        here = None
+    if here:
+        return os.path.dirname(os.path.abspath(here))
+
+    argv0 = sys.argv[0] if sys.argv else ""
+    if argv0 and argv0 not in ("-", "<stdin>"):
+        abs0 = os.path.abspath(argv0)
+        if os.path.isfile(abs0):
+            parts = abs0.replace("\\", "/").split("/")
+            base = os.path.basename(abs0)
+            # Jupyter: argv0 is site-packages/ipykernel_launcher.py — not the project
+            if base != "ipykernel_launcher.py" and "site-packages" not in parts:
+                return os.path.dirname(abs0)
+
+    return os.path.abspath(os.getcwd())
+
+
+PROJECT_ROOT = _project_root()
 UTILS_PATH = os.path.join(PROJECT_ROOT, "utils")
 sys.path.insert(0, UTILS_PATH)
 
@@ -102,7 +133,8 @@ def main():
     parser.add_argument("--build-contract-pdf", action="store_true")
     parser.add_argument("--build-rag-index", action="store_true")
     parser.add_argument("--all", action="store_true")
-    args = parser.parse_args()
+    # Jobs may run main.py inside Jupyter/ipython (ipykernel passes -f kernel.json, etc.)
+    args, _unknown = parser.parse_known_args()
 
     run_default = args.all or not any(
         [args.train, args.build_contract_pdf, args.build_rag_index]

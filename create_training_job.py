@@ -4,6 +4,8 @@ Create (and optionally run) a Cloudera AI **Job** via API v2 (`cmlapi`) that exe
 
 Uses the same credentials as ``create_model.py``: ``CDSW_API_URL``, ``CDSW_APIV2_KEY``, ``CDSW_PROJECT_ID``.
 
+ML Runtime projects **require** a runtime image on the Job: set ``CML_RUNTIME_ID`` (same as ``create_model.py``), ``CML_JOB_RUNTIME_ID``, pass ``--runtime``, or rely on the built-in default Workbench Python 3.13 runtime string.
+
 Examples (Workbench session):
 
   python create_training_job.py --run
@@ -31,6 +33,17 @@ except ImportError:
 
 logging.basicConfig(level=logging.INFO, format="%(message)s")
 logger = logging.getLogger(__name__)
+
+# ML Runtime projects require a kernel image on Job creation (same as model builds).
+_DEFAULT_ML_RUNTIME = "docker.repository.cloudera.com/cloudera/cdsw/ml-runtime-pbj-workbench-python3.13-standard:2026.04.1-b7"
+
+def _resolve_runtime_id(explicit: str | None) -> str:
+    return (
+        (explicit or "").strip()
+        or (os.getenv("CML_RUNTIME_ID") or "").strip()
+        or (os.getenv("CML_JOB_RUNTIME_ID") or "").strip()
+        or _DEFAULT_ML_RUNTIME
+    )
 
 
 def _client_and_project():
@@ -63,8 +76,9 @@ def build_job_request(
     req.timeout = timeout
     if environment:
         req.environment = environment
-    if runtime_identifier and hasattr(req, "runtime_identifier"):
-        req.runtime_identifier = runtime_identifier
+    if not runtime_identifier:
+        raise ValueError("runtime_identifier is required for ML Runtime projects")
+    req.runtime_identifier = runtime_identifier
     return req
 
 
@@ -84,7 +98,8 @@ def create_job_definition(
     cpu = cpu if cpu is not None else float(os.getenv("CML_JOB_CPU", "2"))
     memory = memory if memory is not None else float(os.getenv("CML_JOB_MEMORY", "8"))
     timeout = timeout if timeout is not None else int(os.getenv("CML_JOB_TIMEOUT_SEC", "7200"))
-    rt = runtime_identifier or os.getenv("CML_JOB_RUNTIME_ID")
+    rt = _resolve_runtime_id(runtime_identifier)
+    logger.info("Job ML Runtime: %s", rt)
 
     body = build_job_request(
         name=name,
@@ -131,6 +146,11 @@ def main():
     p.add_argument("--timeout", type=int, default=None, help="Seconds")
     p.add_argument("--run", action="store_true", help="Submit a run immediately after create")
     p.add_argument("--run-only", metavar="JOB_ID", help="Only start a run; do not create")
+    p.add_argument(
+        "--runtime",
+        default=None,
+        help="ML Runtime image id (defaults to CML_RUNTIME_ID, then CML_JOB_RUNTIME_ID, then Workbench Python 3.11 runtime)",
+    )
     args = p.parse_args()
 
     if args.run_only:
@@ -155,6 +175,7 @@ def main():
         memory=args.memory,
         timeout=args.timeout,
         environment=env if env else None,
+        runtime_identifier=args.runtime,
     )
     if args.run:
         start_job_run(jid)
