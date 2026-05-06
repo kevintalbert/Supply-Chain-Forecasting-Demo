@@ -20,16 +20,19 @@ Tables (same names as CSV files without `.csv`):
 - `item_price_history_forecasting`
 - `procurement_transactions`
 
-Load locally with `load_logistics_data.py` (expects CSVs under `data/raw/`).
+Training and **`model_api`** load these tables through **`utils/data_access.py`** via Impala (`SELECT * FROM logistics.<table>`) when **`cml.data_v1`** is available (default on Cloudera AI). For laptop runs without Impala, set **`LOGISTICS_DATA_SOURCE=csv`** and put the three CSVs under **`data/raw/`** (or point **`LOGISTICS_DATA_DIR`** at them). Optional smoke check: **`python load_logistics_data.py`** prints row counts only.
 
 ## Quickstart
+
+On **Cloudera AI**, omit **`LOGISTICS_DATA_SOURCE`** so reads use **`cml.data_v1`** against **`logistics`** (no project CSVs needed).
 
 ```bash
 cd Supply-Chain-Forecasting-Demo
 pip install -r requirements.txt
 
-# Point at your CSV folder (or copy files into data/raw/)
-export LOGISTICS_DATA_DIR=/path/to/dla_synthetic_procurement_copilot_datasets
+# Local CSV fallback only:
+export LOGISTICS_DATA_SOURCE=csv
+export LOGISTICS_DATA_DIR=/path/to/folder_with_three_csvs   # or copy into data/raw/
 
 python main.py --all          # builds PDF + trains + builds RAG index
 ```
@@ -70,7 +73,7 @@ Open `notebooks/supply_chain_forecasting_walkthrough.ipynb` for a narrated walkt
 
 - **Workbench / Jobs**: `main.py` training job; scheduled retrains on fresh warehouse extracts.  
 - **Model Registry / Serving**: `model_api.py` multi-action API used by dashboards.  
-- **Data Warehouse**: Impala `logistics` database via `load_logistics_data.py` (`cml.data_v1`).  
+- **Data Warehouse**: Impala `logistics` database via **`utils/data_access.py`** (`cml.data_v1`); optional **`load_logistics_data.py`** to verify row counts.  
 - **Experiments**: Track `forecasting_metadata.json` MAEs per build.
 
 Synthetic mock data only; safe for public demos.

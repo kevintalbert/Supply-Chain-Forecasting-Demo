@@ -25,7 +25,11 @@ MODELS_DIR = os.path.join(PROJECT_ROOT, "models")
 
 
 def ensure_sample_data():
-    """Copy CSVs into data/raw if missing."""
+    """Copy CSVs into data/raw when using local CSV mode (see utils/data_access.py)."""
+    from data_access import using_csv_files
+
+    if not using_csv_files():
+        return
     os.makedirs(DATA_RAW, exist_ok=True)
     names = [
         "supplier_shipping_performance.csv",
