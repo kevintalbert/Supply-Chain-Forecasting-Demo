@@ -89,7 +89,7 @@ tasks:
   - type: start_application
     name: Forecasting Demo App
     subdomain: forecast-demo
-    script: cml/launch_app.py
+    script: code/launch_app.py
     short_summary: Start Forecasting Demo application
     environment_variables:
       TASK_TYPE: START_APPLICATION
