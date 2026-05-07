@@ -85,3 +85,11 @@ tasks:
   - type: deploy_model
     name: Supply Chain Forecast API
     entity_label: sc_forecast_api
+
+  - type: start_application
+    name: Forecasting Demo App
+    subdomain: forecast-demo
+    script: cml/launch_app.py
+    short_summary: Start Forecasting Demo application
+    environment_variables:
+      TASK_TYPE: START_APPLICATION
