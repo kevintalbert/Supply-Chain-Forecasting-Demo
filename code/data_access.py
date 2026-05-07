@@ -12,7 +12,17 @@ try:
 except ImportError:
     cmldata = None
 
-DEFAULT_DATA_DIR = os.environ.get("LOGISTICS_DATA_DIR") or os.path.join("data", "raw")
+def _default_data_dir() -> str:
+    explicit = (os.environ.get("LOGISTICS_DATA_DIR") or "").strip()
+    if explicit:
+        return explicit
+    for candidate in (
+        os.path.join("data", "raw"),
+        os.path.join("..", "data", "raw"),
+    ):
+        if os.path.isdir(candidate):
+            return candidate
+    return os.path.join("data", "raw")
 
 WAREHOUSE_DB = os.environ.get("LOGISTICS_DATABASE", "logistics")
 WAREHOUSE_CONN = os.environ.get("LOGISTICS_IMPALA_CONN", "default-impala-aws")
@@ -84,7 +94,7 @@ def _read_csv(base: str, filename: str) -> pd.DataFrame:
 
 
 def load_price_history(data_dir: Optional[str] = None) -> pd.DataFrame:
-    base = data_dir or DEFAULT_DATA_DIR
+    base = data_dir or _default_data_dir()
     if using_csv_files():
         df = _read_csv(base, f"{TABLE_PRICE}.csv")
     elif cmldata is None:
@@ -101,7 +111,7 @@ def load_price_history(data_dir: Optional[str] = None) -> pd.DataFrame:
 
 
 def load_transactions(data_dir: Optional[str] = None) -> pd.DataFrame:
-    base = data_dir or DEFAULT_DATA_DIR
+    base = data_dir or _default_data_dir()
     if using_csv_files():
         df = _read_csv(base, f"{TABLE_TX}.csv")
     elif cmldata is None:
@@ -118,7 +128,7 @@ def load_transactions(data_dir: Optional[str] = None) -> pd.DataFrame:
 
 
 def load_supplier_shipping(data_dir: Optional[str] = None) -> pd.DataFrame:
-    base = data_dir or DEFAULT_DATA_DIR
+    base = data_dir or _default_data_dir()
     if using_csv_files():
         df = _read_csv(base, f"{TABLE_SHIP}.csv")
     elif cmldata is None:

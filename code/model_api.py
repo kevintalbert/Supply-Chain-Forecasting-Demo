@@ -15,6 +15,11 @@ import joblib
 import pandas as pd
 
 try:
+    os.chdir("code")
+except Exception:
+    pass
+
+try:
     import cml.models_v1 as models
     import cml.metrics_v1 as metrics
 
@@ -36,8 +41,8 @@ except ImportError:
     metrics = _Met()
     CML_AVAILABLE = False
 
-MODEL_PATH = "models"
-DATA_RAW = os.path.join("data", "raw")
+MODEL_PATH = os.path.join("..", "models")
+DATA_RAW = os.path.join("..", "data", "raw")
 
 from data_access import load_price_history, load_supplier_shipping
 from forecasting_pipeline import (

@@ -32,6 +32,26 @@ Optional UI:
 streamlit run code/app.py
 ```
 
+### JupyterLab / notebook
+
+Training scripts live under **`code/`**. The project kernel’s working directory is usually the project root (`/home/cdsw`), so imports must match **CML churn AMP**: `code/main.py` starts with `os.chdir("code")` before importing project modules.
+
+To train from a notebook, either run the whole script:
+
+```python
+%run code/main.py
+```
+
+or, before any `from forecasting_pipeline import ...`, use the same preamble as `code/main.py`:
+
+```python
+import os
+try:
+    os.chdir("code")
+except Exception:
+    pass
+```
+
 ---
 
 ## Model API (`predict`)
@@ -52,5 +72,6 @@ Place the three CSVs under **`data/raw/`** (or set **`LOGISTICS_DATA_DIR`** to a
 
 ## Troubleshooting
 
+- **`ModuleNotFoundError: No module named 'forecasting_pipeline'`** in a notebook: the kernel cwd is the project root while modules live in **`code/`**. Run **`%run code/main.py`** or add the **`os.chdir("code")`** preamble from `code/main.py` before importing (same pattern as [CML churn AMP](https://github.com/cloudera/CML_AMP_Churn_Prediction)).
 - **`ModuleNotFoundError` on the replica:** build installs **`requirements.txt`** via **`cdsw-build.sh`** — ensure that file is synced to the project.
 - **Registry push errors:** treat as platform/registry issues; this repo keeps dependencies minimal on purpose.

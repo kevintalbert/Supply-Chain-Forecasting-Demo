@@ -6,10 +6,16 @@ from __future__ import annotations
 import argparse
 import os
 
+# Same as CML churn AMP: cwd is project root in sessions/jobs; modules live next to this file.
+try:
+    os.chdir("code")
+except Exception:
+    pass
+
 from forecasting_pipeline import DENSE_DEMO_NSN, run_training
 
-DATA_RAW = os.path.join("data", "raw")
-MODELS_DIR = "models"
+DATA_RAW = os.path.join("..", "data", "raw")
+MODELS_DIR = os.path.join("..", "models")
 
 
 def ensure_sample_data():
