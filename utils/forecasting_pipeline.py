@@ -334,6 +334,14 @@ def run_training(
         summary["experiment_name"] = exp
     with open(os.path.join(models_dir, "forecasting_metadata.json"), "w") as f:
         json.dump(summary, f, indent=2)
+
+    try:
+        from cml_experiments import log_training_run_mlflow
+
+        log_training_run_mlflow(summary, models_dir)
+    except Exception as e:
+        print(f"MLflow / Experiments logging skipped: {e}")
+
     return summary
 
 

@@ -17,6 +17,30 @@ logging.basicConfig(level=logging.INFO, format="%(message)s")
 logger = logging.getLogger(__name__)
 
 
+def _model_build_request(**fields):
+    """CreateModelBuildRequest with slim-deps env when the installed cmlapi supports it."""
+    try:
+        return cmlapi.CreateModelBuildRequest(
+            **fields,
+            environment={"CDSW_REQUIREMENTS_PROFILE": "model"},
+        )
+    except TypeError:
+        pass
+    try:
+        return cmlapi.CreateModelBuildRequest(
+            **fields,
+            build_environment={"CDSW_REQUIREMENTS_PROFILE": "model"},
+        )
+    except TypeError:
+        pass
+    logger.warning(
+        "cmlapi.CreateModelBuildRequest has no environment field — set "
+        "CDSW_REQUIREMENTS_PROFILE=model under Project environment variables "
+        "(not your personal user profile; user env is not passed to model builds)."
+    )
+    return cmlapi.CreateModelBuildRequest(**fields)
+
+
 class Deployer:
     def __init__(self):
         self.host = os.getenv("CDSW_API_URL", "").replace("/api/v1", "").rstrip("/")
@@ -71,7 +95,7 @@ class Deployer:
             self.project_id,
         )
         b = self.client.create_model_build(
-            cmlapi.CreateModelBuildRequest(
+            _model_build_request(
                 project_id=self.project_id,
                 model_id=m.id,
                 file_path=self.body["file_path"],

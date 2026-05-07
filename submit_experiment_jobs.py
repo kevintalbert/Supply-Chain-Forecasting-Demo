@@ -3,7 +3,10 @@
 Create several **training jobs** that differ by ``EXPERIMENT_NAME`` (and optional overrides).
 
 Each job writes ``models/forecasting_metadata.json`` with ``experiment_name`` when training finishes.
-Compare runs in the CML Jobs UI or by downloading artifacts from each job run.
+Training also logs an **MLflow** run to **Project → Experiments** (see ``utils/cml_experiments.py``,
+``MLFLOW_EXPERIMENT_NAME``, ``EXPERIMENT_NAME``).
+
+Compare runs in the **Experiments** UI, the CML Jobs UI, or by downloading artifacts from each job run.
 
 Edit ``EXPERIMENTS`` below, then run inside Workbench::
 

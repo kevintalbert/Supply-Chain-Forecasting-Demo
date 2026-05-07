@@ -25,9 +25,11 @@ This README is written so you can understand the project **without prior ML back
 7. [Quickstart (train locally or in Workbench)](#quickstart)
 8. [Serving API (`model_api.predict`)](#model-serving-pipeline-behind-the-dashboard)
 9. [Cloudera AI: Jobs vs Models](#cloudera-ai-jobs-training-vs-models-serving)
-10. [Recommended order on CML](#recommended-order-on-cloudera-ai)
-11. [Troubleshooting](#troubleshooting)
-12. [Notebooks & touchpoints](#notebooks)
+   - [Compared to Cloudera AMPs](#compared-to-cloudera-amps)
+10. [Cloudera AI Experiments (MLflow tracking)](#cloudera-ai-experiments--mlflow-tracking)
+11. [Recommended order on CML](#recommended-order-on-cloudera-ai)
+12. [Troubleshooting](#troubleshooting)
+13. [Notebooks & touchpoints](#notebooks)
 
 ---
 
@@ -202,7 +204,7 @@ Deploy with **`create_model.py`** inside Cloudera AI (requires `CDSW_API_URL`, `
 |------------|--------------------------|------------------------|
 | **Jobs API** — run `main.py` on a schedule or on demand | **`create_training_job.py`**; **`submit_experiment_jobs.py`** for multiple **`EXPERIMENT_NAME`** values | `CDSW_API_URL`, `CDSW_APIV2_KEY`, `CDSW_PROJECT_ID`; **`CML_RUNTIME_ID`** or **`--runtime`** on ML Runtime projects |
 | **Models API** — HTTP deployment of `model_api.predict` | **`create_model.py`** | Same API vars; **`CML_RUNTIME_ID`** should match the Workbench **Python runtime** you use for Jobs (e.g. Python 3.13 image) |
-| **Experiments** | **`models/forecasting_metadata.json`** | Set **`EXPERIMENT_NAME`** on the Job environment |
+| **Experiments (UI)** | **`utils/cml_experiments.py`** + MLflow in **`run_training`** | ML Runtime Jobs/Sessions; **`MLFLOW_EXPERIMENT_NAME`**, **`EXPERIMENT_NAME`** (run label); see [below](#cloudera-ai-experiments--mlflow-tracking) |
 
 **Jobs** automate **training**. **Models** expose **`predict`** over the network. Use **the same runtime image** for Jobs and model builds when possible so dependencies and Python versions align.
 
@@ -210,14 +212,59 @@ Training picks **`DENSE_DEMO_NSN`** from the environment when set.
 
 **Before Models:** run **`python main.py --all`** (or a Job that runs it) so **`models/`** contains artifacts the served model loads.
 
+### Compared to Cloudera AMPs {#compared-to-cloudera-amps}
+
+#### MLflow Tracking (`CML_AMP_MLFlow_Tracking`)
+
+That prototype keeps **`requirements.txt`** tiny (sklearn + mlflow-skinny + pinned protobuf), declares **`PYTHONPATH=/home/cdsw`** in **`.project-metadata.yaml`**, and ships an **Install Dependencies** job — so images stay small and imports work from any cwd. It does **not** use the **CML Models API** (no HTTP `predict` deployment); this demo does.
+
+This repo adopts the same **AMP mechanics** where they help deployment:
+
+| AMP pattern | In this project |
+|-------------|-----------------|
+| **`.project-metadata.yaml`** `environment_variables` | **`PYTHONPATH`** + default **`CDSW_REQUIREMENTS_PROFILE=model`** so model **builds** pick up slim deps without relying on user-only env vars |
+| **`cml/install_dependencies.py`** job | Same idea: run **`pip install -r requirements.txt`** for the **full** training/notebook stack |
+| Minimal deps | We cannot shrink `requirements.txt` as far as the AMP without dropping LSTM/RAG; instead **`requirements-model.txt`** + **`cdsw-build.sh`** profiles keep **model images** small |
+
+#### Continuous Model Monitoring (`CML_AMP_Continuous_Model_Monitoring`)
+
+That AMP deploys a **hosted model** with **[Model Metrics](https://docs.cloudera.com/machine-learning/cloud/model-metrics/topics/ml-enabling-model-metrics.html)** enabled: **`scripts/predict.py`** uses **`@models.cml_model(metrics=True)`** and **`metrics.track_metric(...)`**, declares **`feature_dependencies: [model_metrics]`**, and lists **`create_model`** → **`build_model`** → **`deploy_model`** in **`.project-metadata.yaml`**. Its **`cdsw-build.sh`** is only **`pip3 install -r requirements.txt`** because dependencies are light.
+
+**Already aligned in this repo:** **`model_api.predict`** uses the same decorator and tracks metrics (for example **`action`**). **Now aligned in metadata:** **`feature_dependencies: [model_metrics]`** plus declarative **create / build / deploy** tasks with sample **`health`** and **`forecast_dense`** payloads — so an AMP-style launch can provision the model without **`create_model.py`**. You can still deploy manually with **`python create_model.py`**; avoid running **both** flows unless you want two models.
+
+If project creation fails because **`model_metrics`** is not enabled on your workspace, remove the **`feature_dependencies`** block from **`.project-metadata.yaml`** or ask your admin to enable Model Metrics.
+
+---
+
+## Cloudera AI Experiments & MLflow tracking {#cloudera-ai-experiments--mlflow-tracking}
+
+Cloudera AI **Experiments** (v2) use the **[MLflow Tracking API](https://docs.cloudera.com/machine-learning/1.5.5/experiments/topics/ml-exp-v2-tracking.html)** so runs appear under **Project → Experiments** (see also the [PDF overview](https://docs.cloudera.com/machine-learning/1.5.5/experiments/ml-experiments.pdf)).
+
+After each successful **`run_training`** (via **`main.py --train`** / **`--all`** or a Job), **`utils/cml_experiments.py`** logs:
+
+- **Parameters:** dense NSN, optional experiment label, sparse strategy, point count  
+- **Metrics:** holdout MAEs for ARIMA, dense GBM, sparse GBM, and LSTM when trained  
+- **Artifact:** **`models/forecasting_metadata.json`** under the run  
+
+**Environment variables**
+
+| Variable | Role |
+|----------|------|
+| **`MLFLOW_EXPERIMENT_NAME`** | Experiment name in the UI (created if missing). Default: **`Supply Chain Forecasting`** |
+| **`EXPERIMENT_NAME`** | Also written into **`forecasting_metadata.json`**; used as the **MLflow run name** when set |
+| **`MLFLOW_RUN_NAME`** | Run name if you prefer not to reuse **`EXPERIMENT_NAME`** |
+| **`MLFLOW_DISABLE`** | Set to **`1`** / **`true`** to skip MLflow logging (local smoke tests) |
+
+Use an **ML Runtime** session or job (Experiments do not run on the legacy engine). **`mlflow`** is listed in **`requirements.txt`**; CML often preinstalls MLflow in runtimes, but listing it keeps Jobs reproducible.
+
 ---
 
 ## Recommended order on Cloudera AI
 
-1. **Install dependencies** in the project (Workbench terminal): `pip install -r requirements.txt` — required for **deployment** (see [Troubleshooting](#troubleshooting)).
-2. **Train:** run **`main.py`** interactively or **`create_training_job.py --run`**.
+1. **Install dependencies:** either run **`pip install -r requirements.txt`** in a Workbench terminal, or run the **Install Dependencies** job created from **`.project-metadata.yaml`** (same outcome as the MLflow AMP — see **`cml/install_dependencies.py`**). **`cdsw-build.sh`** still runs during **model image build**; project env should include **`CDSW_REQUIREMENTS_PROFILE=model`** via metadata or Project settings (see [Troubleshooting](#troubleshooting)).
+2. **Train:** run **`main.py`** interactively or **`create_training_job.py --run`** (Jobs force **`CDSW_REQUIREMENTS_PROFILE=full`** so training uses the full requirements file). Open **Experiments** in the project to compare MLflow runs and metrics.
 3. **Verify** `models/` contains the expected files.
-4. **Deploy:** **`python create_model.py`** with **`CML_RUNTIME_ID`** set to your site’s ML Runtime if defaults differ.
+4. **Deploy:** either run **`python create_model.py`** (Models API from Workbench), **or** rely on the **create_model → build_model → deploy_model** steps in **`.project-metadata.yaml`** when using **Launch as Project / AMP** (same pattern as **Continuous Model Monitoring** — do not duplicate both unless you intend to). Set **`CML_RUNTIME_ID`** if your site’s ML Runtime differs from the default.
 5. **Test** the deployment URL with **`{"action":"health"}`** then a forecast payload.
 
 ---
@@ -258,10 +305,9 @@ The image **build** finished (`exporting layers` succeeded), but **pushing** to 
 
 **Fix (recommended):**
 
-1. On the **deployed model** (model build settings / environment variables), set:
-   **`CDSW_REQUIREMENTS_PROFILE=model`**
-2. Redeploy so **`cdsw-build.sh`** uses **`requirements-model.txt`** (slim) and installs **CPU-only PyTorch** before the rest.
-3. Keep **`requirements.txt`** for Workbench sessions and **training Jobs** (full stack including Jupyter / Streamlit if you use them).
+1. Set **`CDSW_REQUIREMENTS_PROFILE=model`** in **Project** settings → **Environment variables** (or site admin global env). **Personal / user-level environment variables are not passed into model image builds** on many Cloudera AI deployments, which is why the build log still shows **`requirements.txt`** if you only set it on your user profile. **`create_model.py`** also tries to pass this on the build request when your **`cmlapi`** supports it.
+2. Redeploy so **`cdsw-build.sh`** uses **`requirements-model.txt`** (slim) and installs **CPU-only PyTorch** before the rest. Successful slim builds log **`profile=model`** and **`requirements-model.txt`** (not only **`requirements.txt`**).
+3. Keep **`requirements.txt`** for Workbench sessions and **training Jobs** (full stack including Jupyter / Streamlit if you use them). **`create_training_job.py`** sets **`CDSW_REQUIREMENTS_PROFILE=full`** on the Job so training still installs the full file even when the project default is **`model`**.
 
 If it still fails after slimming the image, treat it as a **platform/infrastructure** issue (registry disk/quota, ingress body limits, known Harbor/registry bugs). Open a ticket with your platform team and attach the build log.
 
@@ -276,6 +322,6 @@ Open `notebooks/supply_chain_forecasting_walkthrough.ipynb` for plots and RAG fu
 - **Workbench / Jobs:** `create_training_job.py`, `submit_experiment_jobs.py`, or `main.py` manually.  
 - **Model Registry / Serving:** `create_model.py` + `model_api.py` (`predict`).  
 - **Warehouse:** `utils/data_access.py` (read-only); `load_logistics_data.py` for row counts.  
-- **Experiments:** `EXPERIMENT_NAME` → `forecasting_metadata.json`.
+- **Experiments:** `EXPERIMENT_NAME` / `MLFLOW_EXPERIMENT_NAME` → MLflow UI + `forecasting_metadata.json`.
 
 Synthetic mock data only; safe for public demos.

@@ -9,6 +9,7 @@ reportlab>=4.0.0
 matplotlib>=3.8.0
 jupyter>=1.0.0
 streamlit>=1.31.0
+mlflow>=2.8.0
 
 # On Cloudera AI Workbench, ``cmlapi`` is preinstalled (REST API v2 client for Jobs & Models).
 # Optional / heavier (LSTM + semantic RAG). Comment out on constrained sandboxes.
