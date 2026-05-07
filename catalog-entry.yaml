@@ -22,14 +22,14 @@ entries:
       do not configure, launch, or otherwise use this AMP.
       By configuring, launching, or otherwise using the AMP, you acknowledge the foregoing statement and
       agree that Cloudera is not responsible or liable in any way for the third-party software packages.
-    image_path: "https://raw.githubusercontent.com/YOUR_ORG/Supply-Chain-Forecasting-Demo/main/images/catalog-cover.png"
+    image_path: "https://raw.githubusercontent.com/kevintalbert/Supply-Chain-Forecasting-Demo/refs/heads/main/images/catalog-cover.png"
     tags:
       - Supply Chain
       - Forecasting
       - sklearn
       - HistGradientBoosting
       - Cloudera AI
-    git_url: "https://github.com/YOUR_ORG/Supply-Chain-Forecasting-Demo.git"
+    git_url: "https://github.com/kevintalbert/Supply-Chain-Forecasting-Demo.git"
     git_ref: "main"
     is_prototype: true
     is_community: true
