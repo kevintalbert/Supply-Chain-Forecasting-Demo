@@ -10,7 +10,18 @@ This README is written so you can understand the project **without prior ML back
 |-----|-----------------|
 | **Predictive modeling (ARIMA / LSTM / Gradient Boosting)** | Monthly **Turbine Oil** NSN `9150-01-123-4567`: **ARIMA**, **HistGradientBoostingRegressor** on lags + demand + market features, optional **TensorFlow LSTM**. |
 | **Sparse / intermittent demand** | **Legacy Valve** NSN `4820-00-111-2222`: irregular timestamps → **HistGradientBoosting** with `gap_days`, market deltas, supplier KPIs. |
-| **Unstructured + structured fusion (RAG)** | Mock PDF → chunked retrieval (**sentence-transformers** or TF-IDF fallback) → joined with warehouse-style price/order context. |
+| **Unstructured + structured fusion (RAG)** | Mock PDF → chunked retrieval (**TF-IDF** on deployed models; optional **sentence-transformers** when training locally with full `requirements.txt`) → joined with warehouse-style price/order context. |
+
+---
+
+## Deployed model vs local demos
+
+| Where | Dependencies | What you get |
+|--------|----------------|--------------|
+| **CML model image** (`cdsw-build.sh` → **`requirements-model.txt`**) | Small set (pandas, sklearn, statsmodels, …) — **no TensorFlow, torch, or sentence-transformers** | **ARIMA**, **dense + sparse GBM**, **RAG** with a **TF-IDF** index (`rag_metadata.json` encoder `tfidf_fallback`). **`lstm_next_step`** may be **null** (no Keras in the image). |
+| **Workbench, Jobs, Streamlit (`app.py`)** | **`pip install -r requirements.txt`** | Train **LSTM**, optional **MiniLM** RAG index, Streamlit, MLflow, notebooks — full demo parity **on your machine or session**, not in the pushed model image. |
+
+Train and refresh **`models/`** with the full stack first; deploy the HTTP model with the slim image so the build **pushes** reliably.
 
 ---
 
@@ -37,13 +48,15 @@ This README is written so you can understand the project **without prior ML back
 
 | Phase | What runs | What it produces / uses |
 |--------|-----------|-------------------------|
-| **Training** | `main.py` → `utils/forecasting_pipeline.py`, optional PDF + `utils/contract_rag.py` | Files under **`models/`** (saved models, indexes, metadata) |
-| **Serving** | **`model_api.predict`** (after you deploy with `create_model.py`) | Loads **`models/`**, answers HTTP/JSON requests (forecasts, explanations, health) |
+| **Training** | `main.py` → `utils/forecasting_pipeline.py`, optional PDF + `utils/contract_rag.py` — use **`requirements.txt`** (Workbench or Job) | Files under **`models/`** (saved models, indexes, metadata) |
+| **Serving (HTTP)** | **`model_api.predict`** on CML after **`create_model.py`** / model build | **`requirements-model.txt`** in the container: loads **`models/`**, serves forecasts + TF-IDF RAG |
 
 **Training** = learn patterns from **past** data and write files to disk.  
 **Serving** = load those files and answer **new** questions using **fresh** data where needed.
 
 You must **train first** (so `models/` exists), then **deploy** the model. They solve different problems.
+
+For **Streamlit** or **local** calls to `model_api.predict` with every feature (LSTM, MiniLM RAG), use **`pip install -r requirements.txt`** — that environment is separate from the slim **deployed** replica.
 
 ---
 
@@ -222,9 +235,9 @@ This repo adopts the same **AMP mechanics** where they help deployment:
 
 | AMP pattern | In this project |
 |-------------|-----------------|
-| **`.project-metadata.yaml`** `environment_variables` | **`PYTHONPATH`** + default **`CDSW_REQUIREMENTS_PROFILE=model`** so model **builds** pick up slim deps without relying on user-only env vars |
+| **`.project-metadata.yaml`** `environment_variables` | **`PYTHONPATH`**; **`cdsw-build.sh`** defaults to **`requirements-model.txt`** without needing env vars |
 | **`cml/install_dependencies.py`** job | Same idea: run **`pip install -r requirements.txt`** for the **full** training/notebook stack |
-| Minimal deps | We cannot shrink `requirements.txt` as far as the AMP without dropping LSTM/RAG; instead **`requirements-model.txt`** + **`cdsw-build.sh`** profiles keep **model images** small |
+| Minimal deps | **`requirements-model.txt`** drops **TensorFlow**, **torch**, and **sentence-transformers** so model images stay within typical registry limits; use **`requirements.txt`** + **`CDSW_REQUIREMENTS_PROFILE=full`** for training/LSTM/MiniLM-RAG |
 
 #### Continuous Model Monitoring (`CML_AMP_Continuous_Model_Monitoring`)
 
@@ -261,7 +274,7 @@ Use an **ML Runtime** session or job (Experiments do not run on the legacy engin
 
 ## Recommended order on Cloudera AI
 
-1. **Install dependencies:** either run **`pip install -r requirements.txt`** in a Workbench terminal, or run the **Install Dependencies** job created from **`.project-metadata.yaml`** (same outcome as the MLflow AMP — see **`cml/install_dependencies.py`**). **`cdsw-build.sh`** still runs during **model image build**; project env should include **`CDSW_REQUIREMENTS_PROFILE=model`** via metadata or Project settings (see [Troubleshooting](#troubleshooting)).
+1. **Install dependencies:** either run **`pip install -r requirements.txt`** in a Workbench terminal, or run the **Install Dependencies** job created from **`.project-metadata.yaml`** (same outcome as the MLflow AMP — see **`cml/install_dependencies.py`**). **Model image builds** run **`cdsw-build.sh`**, which installs from **`requirements-model.txt`** by default (see [Troubleshooting](#troubleshooting) to force **`requirements.txt`**).
 2. **Train:** run **`main.py`** interactively or **`create_training_job.py --run`** (Jobs force **`CDSW_REQUIREMENTS_PROFILE=full`** so training uses the full requirements file). Open **Experiments** in the project to compare MLflow runs and metrics.
 3. **Verify** `models/` contains the expected files.
 4. **Deploy:** either run **`python create_model.py`** (Models API from Workbench), **or** rely on the **create_model → build_model → deploy_model** steps in **`.project-metadata.yaml`** when using **Launch as Project / AMP** (same pattern as **Continuous Model Monitoring** — do not duplicate both unless you intend to). Set **`CML_RUNTIME_ID`** if your site’s ML Runtime differs from the default.
@@ -281,7 +294,7 @@ The model runtime executes **`model_api.py`** in an ML Runtime kernel. That envi
    ```bash
    pip install -r requirements.txt
    ```
-   Install at least **`joblib`**, **`pandas`**, **`numpy`**, **`scikit-learn`**, **`statsmodels`**, and any stack your site needs for RAG/LSTM (`pypdf`, optional `tensorflow`, `sentence-transformers`, etc.).
+   Install at least **`joblib`**, **`pandas`**, **`numpy`**, **`scikit-learn`**, **`statsmodels`**, **`pypdf`**, etc. For full LSTM training or sentence-transformer RAG locally, use **`requirements.txt`** (includes **`tensorflow`** / **`sentence-transformers`**).
 
 2. If your site uses **project-level dependency settings** (e.g. pinned packages in the UI), add the same dependencies there so **model replicas** see them.
 
@@ -301,15 +314,36 @@ On **ML Runtime projects**, Jobs and model builds need **`runtime_identifier`**.
 
 ### Model build: `failed to push ... s2i-registry ... blob upload invalid` / `unknown: unknown error`
 
-The image **build** finished (`exporting layers` succeeded), but **pushing** to the cluster registry failed. That often happens when the image is **too large**: on Linux, **`sentence-transformers`** pulls **`torch`** from PyPI, which defaults to **CUDA builds** and drags in **multi‑gigabyte NVIDIA wheel layers**, on top of TensorFlow and (if present) Jupyter.
+The image **build** finished (`exporting layers` succeeded), but **pushing** to the cluster registry failed. That usually means the image is **still too large** for your **`s2i-registry`** limits. The largest offenders were historically **`tensorflow`** (~hundreds of MB), **`torch`** (especially CUDA builds), and their transitive deps.
 
 **Fix (recommended):**
 
-1. Set **`CDSW_REQUIREMENTS_PROFILE=model`** in **Project** settings → **Environment variables** (or site admin global env). **Personal / user-level environment variables are not passed into model image builds** on many Cloudera AI deployments, which is why the build log still shows **`requirements.txt`** if you only set it on your user profile. **`create_model.py`** also tries to pass this on the build request when your **`cmlapi`** supports it.
-2. Redeploy so **`cdsw-build.sh`** uses **`requirements-model.txt`** (slim) and installs **CPU-only PyTorch** before the rest. Successful slim builds log **`profile=model`** and **`requirements-model.txt`** (not only **`requirements.txt`**).
-3. Keep **`requirements.txt`** for Workbench sessions and **training Jobs** (full stack including Jupyter / Streamlit if you use them). **`create_training_job.py`** sets **`CDSW_REQUIREMENTS_PROFILE=full`** on the Job so training still installs the full file even when the project default is **`model`**.
+1. **`cdsw-build.sh` installs from `requirements-model.txt` by default**, which in this repo **omits TensorFlow, torch, and sentence-transformers**. Successful slim builds log **`file=requirements-model.txt`** and should **not** download a **`tensorflow-*.whl`** layer. **`cdsw-build.sh`** installs **CPU PyTorch** only if **`sentence-transformers`** appears in the chosen requirements file (so you can opt back in).
+2. **Model serving trade-offs:** without TensorFlow, **`lstm_next_step`** may be **`null`** (ARIMA + GBM still run). For **RAG**, use a **TF-IDF** index (**`encoder`: `tfidf_fallback`** in **`rag_metadata.json`** — the sample repo default). MiniLM indexes require the full stack.
+3. If the build still shows **`file=requirements.txt`**, you likely set **`CDSW_REQUIREMENTS_PROFILE=full`** at Project level — remove it for model builds, or rely on the script default after syncing the latest **`cdsw-build.sh`**.
+4. Keep **`requirements.txt`** for Workbench sessions and **training Jobs** (full stack). **`create_training_job.py`** sets **`CDSW_REQUIREMENTS_PROFILE=full`** on the Job so **`cdsw-build`** there uses the full file.
 
-If it still fails after slimming the image, treat it as a **platform/infrastructure** issue (registry disk/quota, ingress body limits, known Harbor/registry bugs). Open a ticket with your platform team and attach the build log.
+If it still fails after a log shows **`requirements-model.txt`** and **no** huge ML wheels, treat it as a **platform/infrastructure** issue (registry disk/quota, ingress body limits, known Harbor/registry bugs). Open a ticket with your platform team and attach the build log.
+
+### Model build: `bash\r`, `bad interpreter`, `cannot execute: required file not found`, exit 127
+
+These are the **same root cause**: **`cdsw-build.sh` on the build worker still has CRLF**, so Linux treats the shebang interpreter as **`/bin/bash\r`** (or **`bash\r`** via `env`). Typical messages:
+
+- `/usr/bin/env: 'bash\r': No such file or directory`
+- **`/bin/bash: ... cdsw-build.sh: cannot execute: required file not found`** ← interpreter path does not exist once `\r` is appended
+- `/bin/bash\r: bad interpreter`
+
+Your laptop copy may already be LF while **Git / zip / Workbench upload** still ships CRLF.
+
+**Fix (pick one):**
+
+1. **Workbench (authoritative for the build):** In a session terminal at the project root, strip CR and save, then rebuild the model:
+   ```bash
+   python3 -c "p='cdsw-build.sh'; d=open(p,'rb').read().replace(b'\r\n',b'\n').replace(b'\r',b'\n'); open(p,'wb').write(d)"
+   ```
+   Verify: `python3 -c "print(open('cdsw-build.sh','rb').read().count(b'\\r'))"` → must print **`0`**. Optional: `head -1 cdsw-build.sh | od -An -tx1` — line ends with **`0a`** (newline), not **`0d 0a`**.
+2. **Editor:** Set **`cdsw-build.sh`** to **LF** (VS Code / Cursor status bar: CRLF → LF), save, **sync / commit / push** so Cloudera pulls the updated file.
+3. **Git on Windows:** Use **`core.autocrlf=false`** or **`input`** for this repo if needed. **`cdsw-build.sh`** is marked **`-text`** in **`.gitattributes`** so Git does not apply CRLF checkout conversion to that file once you’ve pulled the latest repo metadata.
 
 ---
 

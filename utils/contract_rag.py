@@ -127,6 +127,12 @@ def retrieve(
 
         vec = index.get("vectorizer")
         if vec is None:
+            if enc != "tfidf_fallback" and not _ST_AVAILABLE:
+                raise ValueError(
+                    f"RAG index encoder is {enc!r} but sentence-transformers is not installed. "
+                    "Rebuild with TF-IDF (utils.contract_rag.build_index fallback) or install "
+                    "sentence-transformers (full training/serving requirements)."
+                )
             raise ValueError("RAG index missing vectorizer for TF-IDF mode")
         qv = vec.transform([query]).toarray().astype(np.float32)
         sim = cosine_similarity(qv, emb)[0]

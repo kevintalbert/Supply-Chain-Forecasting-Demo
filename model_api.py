@@ -1,5 +1,10 @@
 """
 Cloudera AI model entrypoint: procurement price forecasting + contract RAG explanations.
+
+**Deployed replicas** install only ``requirements-model.txt`` (classical ML + TF-IDF RAG).
+For optional **TensorFlow LSTM** inference or **sentence-transformer** RAG, train locally or in
+Jobs with ``requirements.txt`` — use Streamlit ``app.py`` with that full environment; the HTTP
+model on CML stays slim so the image can be pushed to the cluster registry.
 """
 
 from __future__ import annotations

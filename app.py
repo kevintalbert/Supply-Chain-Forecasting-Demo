@@ -5,13 +5,17 @@ Visual MLOps explorer for the Supply Chain Forecasting demo.
 Calls your **deployed** model HTTP endpoint (production path) or **model_api.predict**
 locally when no URL is set (development path).
 
-Run locally (project root, after training so ``models/`` exists):
+**Local parity** (optional LSTM + richer RAG): install the full stack, then train so ``models/``
+exists::
 
-  pip install streamlit requests
+  pip install -r requirements.txt
   streamlit run app.py
 
-On Cloudera AI, set the prediction URL from the deployed model’s **Invoke** / API tab.
-Typical env:
+The deployed CML model uses a **minimal** image (no TensorFlow / torch); local ``predict`` can
+still load ``dense_lstm.keras`` or MiniLM-based RAG indexes when those artifacts exist and the
+full packages are installed.
+
+On Cloudera AI, set the prediction URL from the deployed model’s **Invoke** / API tab::
 
   export CML_MODEL_PREDICT_URL="https://<host>/.../predict"
   export CDSW_APIV2_KEY="<api-key>"   # if the endpoint requires a bearer token

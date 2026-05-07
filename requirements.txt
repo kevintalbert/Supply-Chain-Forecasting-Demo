@@ -1,3 +1,7 @@
+# Full stack: Workbench sessions, training Jobs, Streamlit ``app.py``, notebooks, MLflow.
+# Not used for CML *model image* builds — those use ``requirements-model.txt`` via ``cdsw-build.sh``
+# (slim image). Install this file locally or on Jobs to train LSTM + optional MiniLM RAG.
+
 pandas>=2.1.0
 numpy>=1.24.0
 scikit-learn>=1.3.0
