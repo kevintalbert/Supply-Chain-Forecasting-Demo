@@ -1,31 +1,20 @@
 #!/usr/bin/env python3
 # ###########################################################################
-# CML “Install Dependencies” job — `pip install -r requirements.txt` (same as churn AMP).
-# Model builds use the same `requirements.txt` via `cdsw-build.sh`.
+# CML “Install Dependencies” job — pip installs project ``requirements.txt``.
+# Model builds use the same file via ``cdsw-build.sh``.
 # ###########################################################################
-from __future__ import annotations
-
 import subprocess
 import sys
-from pathlib import Path
-
-ROOT = Path(__file__).resolve().parents[1]
-REQ = ROOT / "requirements.txt"
 
 
 def main() -> None:
-    if not REQ.is_file():
-        print(f"Missing {REQ}", file=sys.stderr)
-        sys.exit(1)
     subprocess.check_call(
         [sys.executable, "-m", "pip", "install", "--upgrade", "pip"],
-        cwd=str(ROOT),
     )
     subprocess.check_call(
-        [sys.executable, "-m", "pip", "install", "-r", str(REQ)],
-        cwd=str(ROOT),
+        [sys.executable, "-m", "pip", "install", "-r", "requirements.txt"],
     )
-    print("code/0_install_dependencies.py: installed", REQ)
+    print("Installed requirements.txt")
 
 
 if __name__ == "__main__":

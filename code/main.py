@@ -1,21 +1,15 @@
 #!/usr/bin/env python3
-"""Train two sklearn models and save artifacts under ``../models/`` (see ``forecasting_pipeline.py``)."""
+"""Train two sklearn models and save artifacts under ``models/`` (see ``forecasting_pipeline.py``)."""
 
 from __future__ import annotations
 
 import argparse
 import os
 
-try:
-    os.chdir("code")
-except Exception:
-    pass
-
 from forecasting_pipeline import DENSE_DEMO_NSN, run_training
 
-PROJECT_ROOT = os.path.dirname(os.path.abspath(os.getcwd()))
-DATA_RAW = os.path.join(PROJECT_ROOT, "data", "raw")
-MODELS_DIR = os.path.join(PROJECT_ROOT, "models")
+DATA_RAW = os.path.join("data", "raw")
+MODELS_DIR = "models"
 
 
 def ensure_sample_data():

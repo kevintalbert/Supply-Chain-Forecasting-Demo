@@ -12,10 +12,7 @@ try:
 except ImportError:
     cmldata = None
 
-DEFAULT_DATA_DIR = os.environ.get(
-    "LOGISTICS_DATA_DIR",
-    os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "raw"),
-)
+DEFAULT_DATA_DIR = os.environ.get("LOGISTICS_DATA_DIR") or os.path.join("data", "raw")
 
 WAREHOUSE_DB = os.environ.get("LOGISTICS_DATABASE", "logistics")
 WAREHOUSE_CONN = os.environ.get("LOGISTICS_IMPALA_CONN", "default-impala-aws")
