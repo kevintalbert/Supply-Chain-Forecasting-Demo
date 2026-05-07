@@ -1,0 +1,91 @@
+name: Supply Chain Forecasting
+description: >-
+  Procurement price forecasting on Cloudera AI — two sklearn models (dense monthly vs sparse intermittent),
+  same pattern as CML_AMP_Churn_Prediction (train → joblib → model_api.predict).
+author: Supply Chain Forecasting Demo
+specification_version: 1.0
+prototype_version: 3.0
+date: "2026-05-06"
+
+feature_dependencies:
+  - model_metrics
+
+environment_variables:
+  PYTHONPATH:
+    default: "/home/cdsw"
+    description: "Import project modules and utils from any working directory"
+    prompt_user: false
+  MLFLOW_EXPERIMENT_NAME:
+    default: "Supply Chain Forecasting"
+    description: "MLflow experiment name (training runs)."
+    prompt_user: false
+
+runtimes:
+  - editor: Workbench
+    kernel: Python 3.13
+    edition: Standard
+
+tasks:
+  - type: create_job
+    name: Install Dependencies
+    entity_label: install_dependencies
+    script: cml/install_dependencies.py
+    arguments: None
+    cpu: 1
+    memory: 4
+    short_summary: pip install -r requirements.txt
+    environment:
+      TASK_TYPE: CREATE/RUN_JOB
+
+  - type: run_job
+    entity_label: install_dependencies
+    short_summary: Run install-dependencies job.
+
+  - type: create_job
+    name: Train forecasting models
+    entity_label: train_forecasts
+    script: main.py
+    arguments: "--all"
+    cpu: 2
+    memory: 8
+    short_summary: Train dense + sparse HistGradientBoosting models → models/*.joblib
+    environment:
+      TASK_TYPE: CREATE/RUN_JOB
+
+  - type: run_job
+    entity_label: train_forecasts
+    short_summary: Run training job.
+    long_summary: >-
+      Writes dense_gbm.joblib and sparse_gbm.joblib. Set LOGISTICS_DATA_DIR or warehouse env vars if needed.
+
+  - type: create_model
+    name: Supply Chain Forecast API
+    entity_label: sc_forecast_api
+    description: Dense + sparse price forecasts (sklearn)
+    default_resources:
+      cpu: 2
+      memory: 8
+    default_replication_policy:
+      type: fixed
+      num_replicas: 1
+
+  - type: build_model
+    name: Supply Chain Forecast API
+    entity_label: sc_forecast_api
+    target_file_path: model_api.py
+    target_function_name: predict
+    examples:
+      - request:
+          {"action": "health"}
+      - request:
+          {
+            "action": "forecast_dense",
+            "nsn": "9150-01-123-4567",
+            "horizon_months": 6,
+          }
+      - request:
+          {"action": "forecast_sparse", "nsn": "4820-00-111-2222"}
+
+  - type: deploy_model
+    name: Supply Chain Forecast API
+    entity_label: sc_forecast_api
