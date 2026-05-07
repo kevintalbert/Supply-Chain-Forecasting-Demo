@@ -3,7 +3,7 @@
 Read-only check: row counts for the three ``logistics`` Impala tables.
 
 Does **not** INSERT, TRUNCATE, or otherwise modify the warehouse. Training and the model API
-load data via ``utils/data_access.py`` (warehouse SELECT with automatic fallback to CSV).
+load data via ``data_access.py`` (warehouse SELECT with automatic fallback to CSV).
 
 Env: ``LOGISTICS_IMPALA_CONN``, ``LOGISTICS_DATABASE``.
 """
@@ -11,13 +11,7 @@ Env: ``LOGISTICS_IMPALA_CONN``, ``LOGISTICS_DATABASE``.
 from __future__ import annotations
 
 import os
-import sys
 from datetime import datetime
-
-_SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-_UTILS_DIR = os.path.join(_SCRIPT_DIR, "utils")
-if _UTILS_DIR not in sys.path:
-    sys.path.insert(0, _UTILS_DIR)
 
 try:
     import cml.data_v1 as cmldata
@@ -53,7 +47,7 @@ def _print_zero_diagnostics(conn) -> None:
             print(f"Tables in `{DATABASE_NAME}`:")
             print(show_df.to_string(index=False))
         print(
-            "``utils/data_access.py`` will fall back to CSV under LOGISTICS_DATA_DIR / data/raw "
+            "`data_access.py` will fall back to CSV under LOGISTICS_DATA_DIR / data/raw "
             "when warehouse tables are empty."
         )
     except Exception as e:

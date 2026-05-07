@@ -1,0 +1,5 @@
+# Shell scripts in Git with CRLF break Linux model builds (shebang becomes bash\r).
+*.sh text eol=lf
+
+# Store cdsw-build.sh without text conversion so Windows Git/checkouts cannot reintroduce CRLF.
+cdsw-build.sh -text

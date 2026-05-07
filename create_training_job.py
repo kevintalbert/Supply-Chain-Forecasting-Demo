@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Create (and optionally run) a Cloudera AI **Job** via API v2 (`cmlapi`) that executes ``main.py``.
+Create (and optionally run) a Cloudera AI **Job** via API v2 (`cmlapi`) that executes ``code/main.py``.
 
 Uses the same credentials as ``create_model.py``: ``CDSW_API_URL``, ``CDSW_APIV2_KEY``, ``CDSW_PROJECT_ID``.
 
@@ -85,7 +85,7 @@ def build_job_request(
 def create_job_definition(
     *,
     name: str,
-    script: str = "main.py",
+    script: str = "code/main.py",
     arguments: str = "--all",
     cpu: float | None = None,
     memory: float | None = None,
@@ -137,9 +137,9 @@ def _collect_env_from_shell(keys: tuple[str, ...]) -> dict[str, str]:
 
 
 def main():
-    p = argparse.ArgumentParser(description="CML Jobs API: create training job for main.py")
+    p = argparse.ArgumentParser(description="CML Jobs API: create training job for code/main.py")
     p.add_argument("--name", default="supply-chain-forecast-train", help="Job display name")
-    p.add_argument("--script", default="main.py", help="Project file to execute")
+    p.add_argument("--script", default="code/main.py", help="Project file to execute")
     p.add_argument("--arguments", default="--all", help="CLI args passed to the script")
     p.add_argument("--cpu", type=float, default=None)
     p.add_argument("--memory", type=float, default=None)

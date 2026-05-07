@@ -32,7 +32,7 @@ class Deployer:
         self.body = {
             "name": "supply-chain-forecast-api",
             "description": "Dense + sparse price forecasts (sklearn HistGradientBoosting)",
-            "file_path": "model_api.py",
+            "file_path": "code/model_api.py",
             "function_name": "predict",
             "kernel": "python3",
             "cpu": 2.0,
@@ -43,11 +43,11 @@ class Deployer:
 
     def files_ok(self) -> bool:
         req = [
-            "model_api.py",
+            "code/model_api.py",
             "requirements.txt",
             "cdsw-build.sh",
-            "utils/forecasting_pipeline.py",
-            "utils/data_access.py",
+            "code/forecasting_pipeline.py",
+            "code/data_access.py",
         ]
         bad = [f for f in req if not os.path.exists(f)]
         if bad:

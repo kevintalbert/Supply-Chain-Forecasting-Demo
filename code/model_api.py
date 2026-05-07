@@ -6,7 +6,6 @@ load joblib artifacts and return a dict from ``predict``.
 from __future__ import annotations
 
 import os
-import sys
 import time
 import traceback
 from datetime import datetime
@@ -14,6 +13,11 @@ from typing import Any, Dict
 
 import joblib
 import pandas as pd
+
+try:
+    os.chdir("code")
+except Exception:
+    pass
 
 try:
     import cml.models_v1 as models
@@ -37,19 +41,12 @@ except ImportError:
     metrics = _Met()
     CML_AVAILABLE = False
 
-if os.path.exists("/home/cdsw"):
-    PROJECT_PATH = os.getenv("CDSW_PROJECT_PATH", "/home/cdsw")
-    MODEL_PATH = os.getenv("CDSW_MODEL_PATH", "/home/cdsw/models")
-else:
-    PROJECT_PATH = os.getcwd()
-    MODEL_PATH = os.path.join(PROJECT_PATH, "models")
-
-UTILS_PATH = os.path.join(PROJECT_PATH, "utils")
+PROJECT_PATH = os.path.dirname(os.path.abspath(os.getcwd()))
+MODEL_PATH = os.path.join(PROJECT_PATH, "models")
 DATA_RAW = os.path.join(PROJECT_PATH, "data", "raw")
-sys.path.insert(0, UTILS_PATH)
 
-from data_access import load_price_history, load_supplier_shipping  # noqa: E402
-from forecasting_pipeline import (  # noqa: E402
+from data_access import load_price_history, load_supplier_shipping
+from forecasting_pipeline import (
     DENSE_DEMO_NSN,
     SPARSE_DEMO_NSN,
     iterative_gbm_forecast,

@@ -3,7 +3,7 @@
 Small demo modeled after **[CML_AMP_Churn_Prediction](https://github.com/cloudera/CML_AMP_Churn_Prediction)**:
 
 1. **Train** two `sklearn.ensemble.HistGradientBoostingRegressor` models on procurement CSVs.
-2. **Deploy** `model_api.predict` as a CML Model.
+2. **Deploy** `code/model_api.predict` as a CML Model.
 
 No RAG, no TensorFlow/LSTM, no extra requirements profiles — **`cdsw-build.sh`** is only `pip3 install -r requirements.txt`.
 
@@ -22,14 +22,14 @@ No RAG, no TensorFlow/LSTM, no extra requirements profiles — **`cdsw-build.sh`
 
 ```bash
 pip install -r requirements.txt
-python main.py          # writes models/*.joblib from data/raw/*.csv
+python code/main.py     # writes models/*.joblib from data/raw/*.csv
 python create_model.py  # needs CDSW_API_URL, CDSW_APIV2_KEY, CDSW_PROJECT_ID
 ```
 
 Optional UI:
 
 ```bash
-streamlit run app.py
+streamlit run code/app.py
 ```
 
 ---
@@ -46,7 +46,7 @@ JSON body is a **single dict**. Actions:
 
 ## Data
 
-Place the three CSVs under **`data/raw/`** (or set **`LOGISTICS_DATA_DIR`** to a folder that contains them). See `load_logistics_data.py` / `utils/data_access.py` for schema.
+Place the three CSVs under **`data/raw/`** (or set **`LOGISTICS_DATA_DIR`** to a folder that contains them). See `code/load_logistics_data.py` / `code/data_access.py` for schema.
 
 ---
 

@@ -1,0 +1,21 @@
+# Keep CML / BuildKit model image context small so COPY sources stays fast and pushes succeed.
+# Synced accidentally-included virtualenvs can add gigabytes.
+
+.venv/
+.venv-cml/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.git/
+.gitattributes
+.DS_Store
+mlruns/
+*.egg-info/
+dist/
+build/
+
+# Optional: drop editor/project noise (uncomment if your sync includes these)
+# .cursor/
+# .vscode/
+# *.ipynb_checkpoints/

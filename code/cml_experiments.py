@@ -99,4 +99,3 @@ def log_training_run_mlflow(summary: Dict[str, Any], models_dir: str) -> bool:
     )
 
     return True
-

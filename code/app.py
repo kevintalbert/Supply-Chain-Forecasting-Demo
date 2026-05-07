@@ -4,18 +4,16 @@
 from __future__ import annotations
 
 import os
-import sys
 from typing import Any, Dict
 
 import pandas as pd
 import requests
 import streamlit as st
 
-ROOT = os.path.dirname(os.path.abspath(__file__))
-if ROOT not in sys.path:
-    sys.path.insert(0, ROOT)
-if os.path.join(ROOT, "utils") not in sys.path:
-    sys.path.insert(0, os.path.join(ROOT, "utils"))
+try:
+    os.chdir("code")
+except Exception:
+    pass
 
 from forecasting_pipeline import DENSE_DEMO_NSN, SPARSE_DEMO_NSN
 

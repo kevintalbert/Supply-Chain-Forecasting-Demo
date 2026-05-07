@@ -1,32 +1,19 @@
 #!/usr/bin/env python3
-"""Train two sklearn models and save artifacts under ``models/`` (see ``utils/forecasting_pipeline.py``)."""
+"""Train two sklearn models and save artifacts under ``../models/`` (see ``forecasting_pipeline.py``)."""
 
 from __future__ import annotations
 
 import argparse
 import os
-import sys
 
+try:
+    os.chdir("code")
+except Exception:
+    pass
 
-def _project_root() -> str:
-    for key in ("SUPPLY_CHAIN_PROJECT_ROOT", "CDSW_PROJECT_ROOT"):
-        override = (os.environ.get(key) or "").strip()
-        if override and os.path.isdir(override):
-            return os.path.abspath(override)
-    try:
-        here = __file__
-    except NameError:
-        here = None
-    if here:
-        return os.path.dirname(os.path.abspath(here))
-    # Notebooks / interactive: no __file__; CML Workbench cwd is /home/cdsw.
-    return "/home/cdsw"
+from forecasting_pipeline import DENSE_DEMO_NSN, run_training
 
-
-PROJECT_ROOT = _project_root()
-UTILS_PATH = os.path.join(PROJECT_ROOT, "utils")
-sys.path.insert(0, UTILS_PATH)
-
+PROJECT_ROOT = os.path.dirname(os.path.abspath(os.getcwd()))
 DATA_RAW = os.path.join(PROJECT_ROOT, "data", "raw")
 MODELS_DIR = os.path.join(PROJECT_ROOT, "models")
 
@@ -61,8 +48,6 @@ def ensure_sample_data():
 
 
 def train():
-    from forecasting_pipeline import DENSE_DEMO_NSN, run_training
-
     ensure_sample_data()
     os.makedirs(MODELS_DIR, exist_ok=True)
     dense_nsn = os.environ.get("DENSE_DEMO_NSN", DENSE_DEMO_NSN)

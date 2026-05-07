@@ -9,7 +9,6 @@ from __future__ import annotations
 
 import json
 import os
-import sys
 import warnings
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Tuple
@@ -22,11 +21,7 @@ from sklearn.metrics import mean_absolute_error
 
 warnings.filterwarnings("ignore", category=FutureWarning)
 
-_UTILS_DIR = os.path.dirname(os.path.abspath(__file__))
-if _UTILS_DIR not in sys.path:
-    sys.path.insert(0, _UTILS_DIR)
-
-from data_access import load_price_history, load_supplier_shipping  # noqa: E402
+from data_access import load_price_history, load_supplier_shipping
 
 DENSE_DEMO_NSN = "9150-01-123-4567"
 SPARSE_DEMO_NSN = "4820-00-111-2222"
