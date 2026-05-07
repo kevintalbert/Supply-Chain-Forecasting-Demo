@@ -1,0 +1,36 @@
+name: Supply Chain Forecasting
+
+entries:
+  - title: Supply Chain Forecasting
+    label: supply-chain-forecasting-demo
+    short_description: |
+      Procurement price forecasting on Cloudera AI with two sklearn HistGradientBoosting models—dense monthly demand vs sparse intermittent buys—and a minimal model API pattern like CML AMP Churn Prediction.
+    long_description: |
+      This AMP demonstrates training and deploying procurement forecasts from CSV logistics data on Cloudera AI Workbench and Models.
+
+      You train two sklearn.ensemble.HistGradientBoostingRegressor models: one for regular monthly-style demand (rolling multi-step horizon) and one for rare purchases (next-event price from gap, market, and supplier features). Models are saved as joblib artifacts and served through model_api.predict with actions for health, forecast_dense, and forecast_sparse. Dependencies stay minimal—cdsw-build.sh installs requirements.txt only—and optional Streamlit UI is available for exploration.
+
+      ---------------------------
+      IMPORTANT: Please read the following before proceeding.
+      This AMP includes or otherwise depends on certain third-party software packages.
+      Information about such third-party software packages are made available in the notice file associated with this AMP.
+      By configuring and launching this AMP, you will cause such third-party software packages to be downloaded and installed
+      into your environment, in some instances, from third parties' websites.
+      For each third-party software package, please see the notice file and the applicable websites for more information,
+      including the applicable license terms.
+      If you do not wish to download and install the third-party software packages,
+      do not configure, launch, or otherwise use this AMP.
+      By configuring, launching, or otherwise using the AMP, you acknowledge the foregoing statement and
+      agree that Cloudera is not responsible or liable in any way for the third-party software packages.
+    image_path: "https://raw.githubusercontent.com/YOUR_ORG/Supply-Chain-Forecasting-Demo/main/images/catalog-cover.png"
+    tags:
+      - Supply Chain
+      - Forecasting
+      - sklearn
+      - HistGradientBoosting
+      - Cloudera AI
+    git_url: "https://github.com/YOUR_ORG/Supply-Chain-Forecasting-Demo.git"
+    git_ref: "main"
+    is_prototype: true
+    is_community: true
+    is_new: true

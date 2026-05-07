@@ -1,49 +1,24 @@
 #!/usr/bin/env python3
-"""
-Supply Chain Forecasting Demo — train forecasting models + contract RAG index.
-
-Usage:
-  python main.py --train
-  python main.py --build-contract-pdf
-  python main.py --build-rag-index
-  python main.py --all
-"""
+"""Train two sklearn models and save artifacts under ``models/`` (see ``utils/forecasting_pipeline.py``)."""
 
 from __future__ import annotations
 
 import argparse
 import os
-import subprocess
 import sys
 
 
 def _project_root() -> str:
-    """Resolve repo root; ``__file__`` is missing in some notebook / job runners.
-
-    Override with ``SUPPLY_CHAIN_PROJECT_ROOT`` or ``CDSW_PROJECT_ROOT`` if needed.
-    """
     for key in ("SUPPLY_CHAIN_PROJECT_ROOT", "CDSW_PROJECT_ROOT"):
         override = (os.environ.get(key) or "").strip()
         if override and os.path.isdir(override):
             return os.path.abspath(override)
-
     try:
         here = __file__
     except NameError:
         here = None
     if here:
         return os.path.dirname(os.path.abspath(here))
-
-    argv0 = sys.argv[0] if sys.argv else ""
-    if argv0 and argv0 not in ("-", "<stdin>"):
-        abs0 = os.path.abspath(argv0)
-        if os.path.isfile(abs0):
-            parts = abs0.replace("\\", "/").split("/")
-            base = os.path.basename(abs0)
-            # Jupyter: argv0 is site-packages/ipykernel_launcher.py — not the project
-            if base != "ipykernel_launcher.py" and "site-packages" not in parts:
-                return os.path.dirname(abs0)
-
     return os.path.abspath(os.getcwd())
 
 
@@ -56,7 +31,6 @@ MODELS_DIR = os.path.join(PROJECT_ROOT, "models")
 
 
 def ensure_sample_data():
-    """Ensure demo CSVs exist under data/raw (used when Impala tables are empty or unreadable)."""
     os.makedirs(DATA_RAW, exist_ok=True)
     names = [
         "supplier_shipping_performance.csv",
@@ -86,7 +60,6 @@ def ensure_sample_data():
 
 
 def train():
-    from contract_rag import build_index
     from forecasting_pipeline import DENSE_DEMO_NSN, run_training
 
     ensure_sample_data()
@@ -95,62 +68,13 @@ def train():
     summary = run_training(data_dir=DATA_RAW, models_dir=MODELS_DIR, dense_nsn=dense_nsn)
     print("Training summary:", summary)
 
-    pdf = os.path.join(
-        PROJECT_ROOT, "contracts", "CON-7781_Turbine_Oil_Supply_Agreement.pdf"
-    )
-    if os.path.exists(pdf):
-        build_index(pdf, MODELS_DIR)
-        print("RAG index built from contract PDF.")
-    else:
-        print("Skipping RAG index — run: python scripts/build_mock_contract_pdf.py")
-
-
-def build_pdf():
-    subprocess.check_call(
-        [
-            sys.executable,
-            os.path.join(PROJECT_ROOT, "scripts", "build_mock_contract_pdf.py"),
-        ]
-    )
-
-
-def build_rag_only():
-    from contract_rag import build_index
-
-    pdf = os.path.join(
-        PROJECT_ROOT, "contracts", "CON-7781_Turbine_Oil_Supply_Agreement.pdf"
-    )
-    if not os.path.exists(pdf):
-        build_pdf()
-    os.makedirs(MODELS_DIR, exist_ok=True)
-    build_index(pdf, MODELS_DIR)
-    print("RAG index ready.")
-
 
 def main():
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description="Train dense + sparse forecasting models.")
     parser.add_argument("--train", action="store_true")
-    parser.add_argument("--build-contract-pdf", action="store_true")
-    parser.add_argument("--build-rag-index", action="store_true")
     parser.add_argument("--all", action="store_true")
-    # Jobs may run main.py inside Jupyter/ipython (ipykernel passes -f kernel.json, etc.)
-    args, _unknown = parser.parse_known_args()
-
-    run_default = args.all or not any(
-        [args.train, args.build_contract_pdf, args.build_rag_index]
-    )
-
-    if run_default:
-        build_pdf()
-        train()
-        return
-
-    if args.build_contract_pdf:
-        build_pdf()
-    if args.train:
-        train()
-    if args.build_rag_index:
-        build_rag_only()
+    parser.parse_known_args()
+    train()
 
 
 if __name__ == "__main__":

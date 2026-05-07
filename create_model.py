@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Deploy supply-chain forecasting model to Cloudera AI (cmlapi Models API). See create_training_job.py for Jobs API."""
+"""Deploy the forecasting model to Cloudera AI (cmlapi). Same credentials as Jobs: CDSW_API_URL, CDSW_APIV2_KEY, CDSW_PROJECT_ID."""
 
 import logging
 import os
@@ -17,30 +17,6 @@ logging.basicConfig(level=logging.INFO, format="%(message)s")
 logger = logging.getLogger(__name__)
 
 
-def _model_build_request(**fields):
-    """CreateModelBuildRequest with slim-deps env when the installed cmlapi supports it."""
-    try:
-        return cmlapi.CreateModelBuildRequest(
-            **fields,
-            environment={"CDSW_REQUIREMENTS_PROFILE": "model"},
-        )
-    except TypeError:
-        pass
-    try:
-        return cmlapi.CreateModelBuildRequest(
-            **fields,
-            build_environment={"CDSW_REQUIREMENTS_PROFILE": "model"},
-        )
-    except TypeError:
-        pass
-    logger.warning(
-        "cmlapi.CreateModelBuildRequest has no environment field — set "
-        "CDSW_REQUIREMENTS_PROFILE=model under Project environment variables "
-        "(not your personal user profile; user env is not passed to model builds)."
-    )
-    return cmlapi.CreateModelBuildRequest(**fields)
-
-
 class Deployer:
     def __init__(self):
         self.host = os.getenv("CDSW_API_URL", "").replace("/api/v1", "").rstrip("/")
@@ -49,14 +25,13 @@ class Deployer:
         if not all([self.host, self.api_key, self.project_id]):
             raise ValueError("Need CDSW_API_URL, CDSW_APIV2_KEY, CDSW_PROJECT_ID")
         self.client = cmlapi.default_client(url=self.host, cml_api_key=self.api_key)
-        # Keep in sync with create_training_job._DEFAULT_ML_RUNTIME (ML Runtime image for model build + replicas).
         self.runtime_id = os.getenv(
             "CML_RUNTIME_ID",
             "docker.repository.cloudera.com/cloudera/cdsw/ml-runtime-pbj-workbench-python3.13-standard:2026.04.1-b7",
         )
         self.body = {
-            "name": "supply-chain-price-forecast-api",
-            "description": "Dense ARIMA+GBM+LSTM forecasts, sparse GBM, contract RAG spike explanations",
+            "name": "supply-chain-forecast-api",
+            "description": "Dense + sparse price forecasts (sklearn HistGradientBoosting)",
             "file_path": "model_api.py",
             "function_name": "predict",
             "kernel": "python3",
@@ -70,9 +45,9 @@ class Deployer:
         req = [
             "model_api.py",
             "requirements.txt",
+            "cdsw-build.sh",
             "utils/forecasting_pipeline.py",
             "utils/data_access.py",
-            "utils/contract_rag.py",
         ]
         bad = [f for f in req if not os.path.exists(f)]
         if bad:
@@ -95,7 +70,7 @@ class Deployer:
             self.project_id,
         )
         b = self.client.create_model_build(
-            _model_build_request(
+            cmlapi.CreateModelBuildRequest(
                 project_id=self.project_id,
                 model_id=m.id,
                 file_path=self.body["file_path"],

@@ -1,7 +1,8 @@
 """
-Dense time series: ARIMA + scikit-learn Gradient Boosting + optional LSTM.
+Forecasting with two sklearn models (mirrors the churn AMP pattern: train → joblib → predict).
 
-Sparse / intermittent demand: feature-based gradient boosting with calendar gaps.
+- **Dense:** monthly lubricant-style series → HistGradientBoostingRegressor (rolling forecast).
+- **Sparse:** irregular purchases → HistGradientBoostingRegressor on gap/market/supplier features.
 """
 
 from __future__ import annotations
@@ -22,7 +23,6 @@ from sklearn.metrics import mean_absolute_error
 warnings.filterwarnings("ignore", category=FutureWarning)
 
 _UTILS_DIR = os.path.dirname(os.path.abspath(__file__))
-_ROOT_DIR = os.path.dirname(_UTILS_DIR)
 if _UTILS_DIR not in sys.path:
     sys.path.insert(0, _UTILS_DIR)
 
@@ -35,35 +35,14 @@ SPARSE_DEMO_NSN = "4820-00-111-2222"
 @dataclass
 class DenseTrainResult:
     nsn: str
-    arima_order: Tuple[int, int, int]
-    arima_mae: float
     gbm_mae: float
-    lstm_mae: Optional[float]
     n_points: int
-
-
-def _lags(series: np.ndarray, n_lags: int) -> np.ndarray:
-    rows = []
-    for i in range(n_lags, len(series)):
-        rows.append(series[i - n_lags : i])
-    return np.array(rows)
-
-
-def train_arima(series: pd.Series, order: Tuple[int, int, int] = (2, 1, 1)):
-    from statsmodels.tsa.arima.model import ARIMA
-
-    model = ARIMA(series.astype(float), order=order)
-    return model.fit()
-
-
-def forecast_arima(fitted, steps: int) -> np.ndarray:
-    return fitted.forecast(steps=steps).values
 
 
 def train_gradient_boosting_dense(
     df_item: pd.DataFrame, n_lags: int = 6
 ) -> Tuple[HistGradientBoostingRegressor, List[str], float]:
-    """Direct multi-step style: predict next month price from lags + exogenous."""
+    """Predict next month price from lags + demand + market + calendar month."""
     g = df_item.sort_values("date").reset_index(drop=True)
     price = g["unit_price"].values.astype(float)
     X_rows = []
@@ -92,7 +71,7 @@ def train_gradient_boosting_dense(
     X = np.array(X_rows)
     y = np.array(y)
     if len(y) < 12:
-        raise ValueError("Not enough history for gradient boosting benchmark.")
+        raise ValueError("Not enough history for gradient boosting.")
     split = int(len(y) * 0.8)
     X_train, X_test = X[:split], X[split:]
     y_train, y_test = y[:split], y[split:]
@@ -108,66 +87,10 @@ def train_gradient_boosting_dense(
     return model, feat_names, mae
 
 
-def train_lstm_dense(
-    df_item: pd.DataFrame, seq_len: int = 12
-) -> Tuple[Any, Optional[float]]:
-    """Small univariate LSTM on scaled prices; returns (keras_model, holdout_mae)."""
-    try:
-        import tensorflow as tf
-        from tensorflow import keras
-        from sklearn.preprocessing import MinMaxScaler
-    except ImportError:
-        return None, None
-
-    g = df_item.sort_values("date").reset_index(drop=True)
-    price = g["unit_price"].values.reshape(-1, 1).astype(float)
-    scaler = MinMaxScaler()
-    scaled = scaler.fit_transform(price)
-    Xs, ys = [], []
-    for i in range(seq_len, len(scaled)):
-        Xs.append(scaled[i - seq_len : i, 0])
-        ys.append(scaled[i, 0])
-    X_arr = np.array(Xs).reshape(-1, seq_len, 1)
-    y_arr = np.array(ys)
-    if len(y_arr) < 16:
-        return None, None
-    split = int(len(y_arr) * 0.85)
-    X_train, X_val = X_arr[:split], X_arr[split:]
-    y_train, y_val = y_arr[:split], y_arr[split:]
-
-    tf.keras.utils.set_random_seed(42)
-    model = keras.Sequential(
-        [
-            keras.layers.Input(shape=(seq_len, 1)),
-            keras.layers.LSTM(32, return_sequences=False),
-            keras.layers.Dense(16, activation="relu"),
-            keras.layers.Dense(1),
-        ]
-    )
-    model.compile(optimizer=keras.optimizers.Adam(0.01), loss="mse")
-    model.fit(
-        X_train,
-        y_train,
-        validation_data=(X_val, y_val),
-        epochs=80,
-        batch_size=8,
-        verbose=0,
-    )
-    pred_s = model.predict(X_val, verbose=0).flatten()
-    true_prices = scaler.inverse_transform(y_val.reshape(-1, 1)).flatten()
-    pred_prices = scaler.inverse_transform(pred_s.reshape(-1, 1)).flatten()
-    mae = float(mean_absolute_error(true_prices, pred_prices))
-    # attach scaler for inference
-    model._demo_scaler = scaler  # type: ignore[attr-defined]
-    model._demo_seq_len = seq_len  # type: ignore[attr-defined]
-    return model, mae
-
-
 def build_sparse_training_frame(
     price_df: pd.DataFrame,
     ship_df: pd.DataFrame,
 ) -> pd.DataFrame:
-    """Pool irregular series into rows with gap-based features."""
     rows = []
     ship_df = ship_df.sort_values(["supplier_id", "report_month"])
     for nsn, grp in price_df.groupby("nsn"):
@@ -230,7 +153,6 @@ def train_sparse_gbm(frame: pd.DataFrame) -> Tuple[HistGradientBoostingRegressor
         l2_regularization=0.5,
         random_state=42,
     )
-    # LOOCV-style small sample: simple holdout last 20%
     split = max(1, int(len(y) * 0.75))
     model.fit(X[:split], y[:split])
     pred = model.predict(X[split:])
@@ -247,110 +169,11 @@ def predict_next_sparse(
     return float(model.predict(X)[0])
 
 
-def run_training(
-    data_dir: Optional[str],
-    models_dir: str,
-    dense_nsn: str = DENSE_DEMO_NSN,
-) -> Dict[str, Any]:
-    os.makedirs(models_dir, exist_ok=True)
-    price_df = load_price_history(data_dir)
-    ship_df = load_supplier_shipping(data_dir)
-
-    dense = price_df[price_df["nsn"] == dense_nsn].copy()
-    if dense.empty:
-        raise ValueError(f"No rows for dense NSN {dense_nsn}")
-
-    series = dense.set_index("date")["unit_price"].asfreq("MS").interpolate()
-    arima_fit = train_arima(series)
-    arima_holdout = max(3, min(6, len(series) // 5))
-    train_s = series.iloc[:-arima_holdout]
-    test_s = series.iloc[-arima_holdout:]
-    arima_fit_eval = train_arima(train_s)
-    arima_pred = forecast_arima(arima_fit_eval, steps=len(test_s))
-    arima_mae = float(mean_absolute_error(test_s.values, arima_pred))
-
-    gbm_model, gbm_features, gbm_mae = train_gradient_boosting_dense(dense)
-    lstm_model, lstm_mae = train_lstm_dense(dense)
-
-    sparse_frame = build_sparse_training_frame(price_df, ship_df)
-    sparse_model, sparse_feats, sparse_mae = train_sparse_gbm(sparse_frame)
-
-    joblib.dump(arima_fit, os.path.join(models_dir, "dense_arima_fit.joblib"))
-    joblib.dump(
-        {
-            "model": gbm_model,
-            "feature_names": gbm_features,
-            "n_lags": 6,
-        },
-        os.path.join(models_dir, "dense_gbm.joblib"),
-    )
-    if lstm_model is not None:
-        lstm_path = os.path.join(models_dir, "dense_lstm.keras")
-        lstm_model.save(lstm_path)
-        joblib.dump(
-            {
-                "scaler": lstm_model._demo_scaler,  # type: ignore[attr-defined]
-                "seq_len": lstm_model._demo_seq_len,  # type: ignore[attr-defined]
-            },
-            os.path.join(models_dir, "dense_lstm_meta.joblib"),
-        )
-
-    joblib.dump(
-        {"model": sparse_model, "feature_names": sparse_feats},
-        os.path.join(models_dir, "sparse_gbm.joblib"),
-    )
-    joblib.dump(sparse_frame, os.path.join(models_dir, "sparse_training_frame.joblib"))
-
-    meta = DenseTrainResult(
-        nsn=dense_nsn,
-        arima_order=(2, 1, 1),
-        arima_mae=arima_mae,
-        gbm_mae=gbm_mae,
-        lstm_mae=lstm_mae,
-        n_points=int(len(dense)),
-    )
-
-    summary = {
-        "dense_nsn": dense_nsn,
-        "dense_points": meta.n_points,
-        "arima_mae_holdout": arima_mae,
-        "gbm_mae_holdout": gbm_mae,
-        "lstm_mae_holdout": lstm_mae,
-        "sparse_gbm_mae_holdout": sparse_mae,
-        "sparse_strategy": "gradient_boosting_on_gap_and_market_features",
-        "models_written": [
-            "dense_arima_fit.joblib",
-            "dense_gbm.joblib",
-            "sparse_gbm.joblib",
-        ]
-        + (
-            ["dense_lstm.keras", "dense_lstm_meta.joblib"]
-            if lstm_model is not None
-            else []
-        ),
-    }
-    exp = os.environ.get("EXPERIMENT_NAME")
-    if exp:
-        summary["experiment_name"] = exp
-    with open(os.path.join(models_dir, "forecasting_metadata.json"), "w") as f:
-        json.dump(summary, f, indent=2)
-
-    try:
-        from cml_experiments import log_training_run_mlflow
-
-        log_training_run_mlflow(summary, models_dir)
-    except Exception as e:
-        print(f"MLflow / Experiments logging skipped: {e}")
-
-    return summary
-
-
 def iterative_gbm_forecast(
     dense_history: pd.DataFrame,
     gbm_bundle: Dict[str, Any],
     horizon: int = 6,
 ) -> List[Dict[str, Any]]:
-    """Rolling one-step GBM forecasts using last known demand/market when unknown."""
     g = dense_history.sort_values("date").reset_index(drop=True)
     model: HistGradientBoostingRegressor = gbm_bundle["model"]
     n_lags: int = gbm_bundle.get("n_lags", 6)
@@ -378,29 +201,58 @@ def iterative_gbm_forecast(
     return out
 
 
-def lstm_forecast_next(
-    dense_history: pd.DataFrame,
-    keras_model,
-    lstm_meta: Optional[Dict[str, Any]] = None,
-) -> Optional[float]:
-    if keras_model is None:
-        return None
-    scaler = None
-    seq_len = 12
-    if lstm_meta:
-        scaler = lstm_meta.get("scaler")
-        seq_len = int(lstm_meta.get("seq_len", 12))
-    if scaler is None:
-        scaler = getattr(keras_model, "_demo_scaler", None)
-    if scaler is None:
-        return None
-    seq_len = int(getattr(keras_model, "_demo_seq_len", seq_len))
-    g = dense_history.sort_values("date").reset_index(drop=True)
-    price = g["unit_price"].values.reshape(-1, 1).astype(float)
-    scaled = scaler.transform(price)
-    if len(scaled) < seq_len:
-        return None
-    seq = scaled[-seq_len:, 0].reshape(1, seq_len, 1)
-    pred_s = keras_model.predict(seq, verbose=0)[0, 0]
-    inv = scaler.inverse_transform([[float(pred_s)]])[0, 0]
-    return float(inv)
+def run_training(
+    data_dir: Optional[str],
+    models_dir: str,
+    dense_nsn: str = DENSE_DEMO_NSN,
+) -> Dict[str, Any]:
+    os.makedirs(models_dir, exist_ok=True)
+    price_df = load_price_history(data_dir)
+    ship_df = load_supplier_shipping(data_dir)
+
+    dense = price_df[price_df["nsn"] == dense_nsn].copy()
+    if dense.empty:
+        raise ValueError(f"No rows for dense NSN {dense_nsn}")
+
+    gbm_model, gbm_features, gbm_mae = train_gradient_boosting_dense(dense)
+
+    sparse_frame = build_sparse_training_frame(price_df, ship_df)
+    sparse_model, sparse_feats, sparse_mae = train_sparse_gbm(sparse_frame)
+
+    joblib.dump(
+        {
+            "model": gbm_model,
+            "feature_names": gbm_features,
+            "n_lags": 6,
+        },
+        os.path.join(models_dir, "dense_gbm.joblib"),
+    )
+    joblib.dump(
+        {"model": sparse_model, "feature_names": sparse_feats},
+        os.path.join(models_dir, "sparse_gbm.joblib"),
+    )
+    joblib.dump(sparse_frame, os.path.join(models_dir, "sparse_training_frame.joblib"))
+
+    meta = DenseTrainResult(nsn=dense_nsn, gbm_mae=gbm_mae, n_points=int(len(dense)))
+
+    summary = {
+        "dense_nsn": dense_nsn,
+        "dense_points": meta.n_points,
+        "dense_gbm_mae_holdout": gbm_mae,
+        "sparse_gbm_mae_holdout": sparse_mae,
+        "models_written": ["dense_gbm.joblib", "sparse_gbm.joblib"],
+    }
+    exp = os.environ.get("EXPERIMENT_NAME")
+    if exp:
+        summary["experiment_name"] = exp
+    with open(os.path.join(models_dir, "forecasting_metadata.json"), "w") as f:
+        json.dump(summary, f, indent=2)
+
+    try:
+        from cml_experiments import log_training_run_mlflow
+
+        log_training_run_mlflow(summary, models_dir)
+    except Exception as e:
+        print(f"MLflow / Experiments logging skipped: {e}")
+
+    return summary

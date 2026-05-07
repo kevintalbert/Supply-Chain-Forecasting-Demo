@@ -1,10 +1,6 @@
 """
-Cloudera AI model entrypoint: procurement price forecasting + contract RAG explanations.
-
-**Deployed replicas** install only ``requirements-model.txt`` (classical ML + TF-IDF RAG).
-For optional **TensorFlow LSTM** inference or **sentence-transformer** RAG, train locally or in
-Jobs with ``requirements.txt`` — use Streamlit ``app.py`` with that full environment; the HTTP
-model on CML stays slim so the image can be pushed to the cluster registry.
+CML model entrypoint — two forecasting modes (dense GBM, sparse GBM). Same pattern as churn AMP:
+load joblib artifacts and return a dict from ``predict``.
 """
 
 from __future__ import annotations
@@ -14,7 +10,7 @@ import sys
 import time
 import traceback
 from datetime import datetime
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 
 import joblib
 import pandas as pd
@@ -52,55 +48,24 @@ UTILS_PATH = os.path.join(PROJECT_PATH, "utils")
 DATA_RAW = os.path.join(PROJECT_PATH, "data", "raw")
 sys.path.insert(0, UTILS_PATH)
 
-from contract_rag import (  # noqa: E402
-    load_index,
-    retrieve,
-    structured_price_context,
-)
-from data_access import (  # noqa: E402
-    load_price_history,
-    load_procurement_transactions,
-    load_supplier_shipping,
-)
+from data_access import load_price_history, load_supplier_shipping  # noqa: E402
 from forecasting_pipeline import (  # noqa: E402
     DENSE_DEMO_NSN,
     SPARSE_DEMO_NSN,
-    forecast_arima,
     iterative_gbm_forecast,
-    lstm_forecast_next,
     predict_next_sparse,
 )
 
-dense_arima = None
 dense_gbm_bundle = None
-dense_lstm = None
-dense_lstm_meta = None
 sparse_bundle = None
-rag_index = None
 init_time = None
 
 
-def _load_keras(path: str):
-    try:
-        from tensorflow import keras
-
-        return keras.models.load_model(path)
-    except Exception:
-        return None
-
-
 def initialize_model():
-    global dense_arima, dense_gbm_bundle, dense_lstm, dense_lstm_meta
-    global sparse_bundle, rag_index, init_time
+    global dense_gbm_bundle, sparse_bundle, init_time
     t0 = time.time()
-    dense_arima = joblib.load(os.path.join(MODEL_PATH, "dense_arima_fit.joblib"))
     dense_gbm_bundle = joblib.load(os.path.join(MODEL_PATH, "dense_gbm.joblib"))
     sparse_bundle = joblib.load(os.path.join(MODEL_PATH, "sparse_gbm.joblib"))
-    lstm_path = os.path.join(MODEL_PATH, "dense_lstm.keras")
-    meta_path = os.path.join(MODEL_PATH, "dense_lstm_meta.joblib")
-    dense_lstm = _load_keras(lstm_path) if os.path.exists(lstm_path) else None
-    dense_lstm_meta = joblib.load(meta_path) if os.path.exists(meta_path) else None
-    rag_index = load_index(MODEL_PATH)
     init_time = time.time() - t0
 
 
@@ -116,26 +81,15 @@ def handle_forecast_dense(args: Dict[str, Any]) -> Dict[str, Any]:
     nsn = args.get("nsn", DENSE_DEMO_NSN)
     horizon = int(args.get("horizon_months", 6))
     price_df = load_price_history(_data_dir())
-    sub = price_df[price_df["nsn"] == nsn]
+    sub = price_df[price_df["nsn"] == nsn].sort_values("date")
     if sub.empty:
         return {"error": f"No series for NSN {nsn}"}
-    series = sub.set_index("date")["unit_price"].asfreq("MS").interpolate()
-    arima_future = forecast_arima(dense_arima, steps=horizon)
-    arima_dates = pd.date_range(series.index.max() + pd.offsets.MonthBegin(), periods=horizon, freq="MS")
-    arima_payload = [
-        {"month": str(d.date()), "forecast_price": float(v)}
-        for d, v in zip(arima_dates, arima_future)
-    ]
-    gbm_roll = iterative_gbm_forecast(sub, dense_gbm_bundle, horizon=horizon)
-    lstm_next = lstm_forecast_next(sub, dense_lstm, dense_lstm_meta)
+    forecast = iterative_gbm_forecast(sub, dense_gbm_bundle, horizon=horizon)
     return {
         "nsn": nsn,
-        "models": {
-            "arima": {"holdout_metric": "mae in forecasting_metadata.json", "forecast": arima_payload},
-            "gradient_boosting": {"forecast": gbm_roll},
-            "lstm_next_step": lstm_next,
-        },
-        "note": "ARIMA + gradient boosting + LSTM cover continuous monthly lubricant pricing.",
+        "model": "hist_gradient_boosting_regressor",
+        "forecast": forecast,
+        "last_history_month": str(sub["date"].max().date()),
     }
 
 
@@ -169,51 +123,10 @@ def handle_forecast_sparse(args: Dict[str, Any]) -> Dict[str, Any]:
     )
     return {
         "nsn": nsn,
-        "sparse_strategy": "HistGradientBoosting with gap_days and supplier context (not classical ARIMA)",
+        "model": "hist_gradient_boosting_regressor",
         "last_observed_price": float(cur["unit_price"]),
         "forecast_next_purchase_price": pred,
         "gap_days_between_last_observations": gap_days,
-        "why": "Classical ARIMA/LSTM fail with multi-year gaps; CAI uses feature-based boosting "
-        "pooling intermittent demand signals.",
-    }
-
-
-def handle_explain_spike(args: Dict[str, Any]) -> Dict[str, Any]:
-    nsn = args.get("nsn", DENSE_DEMO_NSN)
-    contract_id = args.get("contract_id", "CON-7781")
-    spike_month = args.get("spike_month")  # optional YYYY-MM-DD
-    price_df = load_price_history(_data_dir())
-    tx_df = load_procurement_transactions(_data_dir())
-    ctx = structured_price_context(
-        nsn, contract_id, price_df, tx_df, spike_month=spike_month
-    )
-    if "error" in ctx:
-        return ctx
-    query = args.get(
-        "rag_query",
-        "energy surcharge escalation lubricant index quarterly price adjustment",
-    )
-    chunks_out = []
-    if rag_index:
-        hits = retrieve(query, rag_index, top_k=3)
-        chunks_out = [{"score": h.score, "text": h.text} for h in hits]
-    narrative = []
-    if ctx.get("mom_pct"):
-        narrative.append(
-            f"Month-over-month unit price moved {ctx['mom_pct']:.1%} around {ctx['spike_month']}."
-        )
-    narrative.append(
-        f"Recorded market_index={ctx.get('market_index')} and demand_quantity={ctx.get('demand_quantity')}."
-    )
-    if chunks_out:
-        narrative.append(
-            "Contract retrieval highlights surcharge clauses that may explain pass-through when indices jump."
-        )
-    return {
-        "structured_context": ctx,
-        "retrieved_contract_clauses": chunks_out,
-        "fusion_summary": " ".join(narrative),
-        "rag_query": query,
     }
 
 
@@ -223,22 +136,19 @@ def predict(args: Dict[str, Any]) -> Dict[str, Any]:
     try:
         action = args.get("action", "forecast_dense")
         metrics.track_metric("action", action)
-        if dense_arima is None:
+        if dense_gbm_bundle is None:
             initialize_model()
 
         if action == "forecast_dense":
             out = handle_forecast_dense(args)
         elif action == "forecast_sparse":
             out = handle_forecast_sparse(args)
-        elif action == "explain_spike":
-            out = handle_explain_spike(args)
         elif action == "health":
             out = {
                 "status": "ok",
                 "cml": CML_AVAILABLE,
                 "init_time_s": init_time,
-                "models_loaded": dense_arima is not None,
-                "rag_loaded": rag_index is not None,
+                "models_loaded": dense_gbm_bundle is not None,
             }
         else:
             out = {"error": f"unknown action {action}"}

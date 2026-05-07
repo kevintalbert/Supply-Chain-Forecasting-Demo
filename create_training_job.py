@@ -169,8 +169,6 @@ def main():
         "LOGISTICS_IMPALA_CONN",
     )
     env = _collect_env_from_shell(env_keys)
-    # If the project sets CDSW_REQUIREMENTS_PROFILE=model for model builds, Jobs still need the full stack.
-    env["CDSW_REQUIREMENTS_PROFILE"] = "full"
 
     jid = create_job_definition(
         name=args.name,

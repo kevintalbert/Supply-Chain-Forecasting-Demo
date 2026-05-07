@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
 # ###########################################################################
-# CML “Install Dependencies” job (same role as Cloudera AMP MLflow Tracking
-# `cml/install_dependencies.py`). Runs a full `pip install -r requirements.txt`
-# for Workbench / Jobs. Model *image* builds use `cdsw-build.sh` (often with
-# `CDSW_REQUIREMENTS_PROFILE=model` at project level from `.project-metadata.yaml`).
+# CML “Install Dependencies” job — `pip install -r requirements.txt` for Workbench sessions.
+# Model builds use the same `requirements.txt` via `cdsw-build.sh`.
 # ###########################################################################
 from __future__ import annotations
 
