@@ -19,7 +19,8 @@ def _project_root() -> str:
         here = None
     if here:
         return os.path.dirname(os.path.abspath(here))
-    return os.path.abspath(os.getcwd())
+    # Notebooks / interactive: no __file__; CML Workbench cwd is /home/cdsw.
+    return "/home/cdsw"
 
 
 PROJECT_ROOT = _project_root()

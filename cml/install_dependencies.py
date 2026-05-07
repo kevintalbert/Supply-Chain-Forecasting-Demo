@@ -5,11 +5,28 @@
 # ###########################################################################
 from __future__ import annotations
 
+import os
 import subprocess
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
+
+def _project_root() -> Path:
+    for key in ("SUPPLY_CHAIN_PROJECT_ROOT", "CDSW_PROJECT_ROOT"):
+        override = (os.environ.get(key) or "").strip()
+        if override and os.path.isdir(override):
+            return Path(override).resolve()
+    try:
+        here = __file__
+    except NameError:
+        here = None
+    if here:
+        return Path(here).resolve().parents[1]
+    # Notebooks / interactive: no __file__; CML Workbench project lives under /home/cdsw.
+    return Path("/home/cdsw").resolve()
+
+
+ROOT = _project_root()
 REQ = ROOT / "requirements.txt"
 
 
